@@ -1,0 +1,59 @@
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Git and Documentation
+.git/
+.gitignore
+.gitattributes
+README.md
+docs/
+
+# Django generated files
+staticfiles/
+media/
+*.log
+
+# Tests and development artifacts
+test/
+tests/__pycache__/
+*.sqlite3-journal
+
+# Editors and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*~
+
+# Node dependencies, if frontend files exist in this repository
+node_modules/
+
+# Local databases
+*.sqlite3
+*.db
+
+# Build artifacts
+dist/
+build/
