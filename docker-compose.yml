@@ -1,16 +1,56 @@
+version: '3.8'
+
 services:
   db:
     image: pgvector/pgvector:pg16
     container_name: ai_career_coach_postgres
     environment:
-      POSTGRES_DB: ai_career_coach
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Abc@12345
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai_career_coach_backend
+    entrypoint: ["/bin/sh", "/app/entrypoint.sh"]
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8001:8001"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_HOST=db                 # Ép cứng thành 'db' để trỏ đúng tên service trong mạng Docker
+      - DB_PORT=5432               # Ép cứng cổng mặc định của PostgreSQL
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - db
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai_career_coach_frontend
+    volumes:
+      - /app/node_modules
+    ports:
+      - "5174:5174"
+    environment:
+      - NODE_ENV=development
+      - VINEXT_NO_DEV_LOCK=1
+    depends_on:
+      - backend
     restart: always
 
 volumes:

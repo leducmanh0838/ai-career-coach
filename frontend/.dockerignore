@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs and generated caches
+.next
+.vinext
+.cloudflare
+dist
+build
+out
+
+# Environment files (keep example templates)
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Version control
+.git
+.gitignore
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Tests and coverage
+coverage
+test-results
+playwright-report
+
+# Temporary files
+tmp
+temp
+*.tmp
