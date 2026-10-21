@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from pgvector.django import VectorField, HnswIndex
 
 
 class CustomUser(AbstractUser):
@@ -56,6 +57,12 @@ class Skill(models.Model):
         blank=True,
         verbose_name="Danh sách từ đồng nghĩa (JSON list)",
     )
+    embedding = VectorField(
+        dimensions=1536,
+        null=True,
+        blank=True,
+        verbose_name="Vector embedding"
+    )
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name="Ngày tạo"
     )
@@ -64,6 +71,16 @@ class Skill(models.Model):
     class Meta:
         verbose_name = "Kỹ năng chuẩn"
         verbose_name_plural = "Danh mục kỹ năng chuẩn"
+
+        indexes = [
+            HnswIndex(
+                fields=["embedding"],
+                name="skill_embedding_hnsw_idx",
+                m=16,
+                ef_construction=64,
+                opclasses=["vector_cosine_ops"]
+            )
+        ]
 
     def __str__(self):
         return self.name
