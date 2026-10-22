@@ -1,17 +1,824 @@
 @import "tailwindcss";
 
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap");
+
 :root {
-  color-scheme: light;
-  background: #f8fafc;
-  color: #111827;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* ------------------------------------------------------------------------
+     1. UNIFIED COLOR TOKENS — LIGHT MODE (Default)
+     Synchronized between Material 3 Semantic Roles & Tailwind Brand Palette
+     Adjusted for WCAG 2.1 AA Contrast Ratio (>= 4.5:1 for normal text)
+     ------------------------------------------------------------------------ */
+
+  /* Foundation & Canvas Surfaces */
+  --surface: #f8fbff;
+  --surface-dim: #e2e8f0;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f8fbff;
+  --surface-container: #f1f5f9;
+  --surface-container-high: #e2e8f0;
+  --surface-container-highest: #cbd5e1;
+  --surface-variant: #e2e8f0;
+  --background: #f8fbff;
+
+  /* Glassmorphism Surfaces */
+  --glass-surface: rgba(255, 255, 255, 0.82);
+  --glass-surface-elevated: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --glass-blur: 16px;
+
+  /* Typography & Neutral Colors (WCAG 2.1 AA Compliant on Light Surfaces) */
+  --on-surface: #0f172a; /* Headings / Deep Navy (17.4:1) */
+  --on-background: #0f172a;
+  --text-heading: #0f172a;
+  --text-subheading: #1e293b; /* Subheadings / Charcoal (13.6:1) */
+  --on-surface-variant: #475569; /* Body / Slate 600 (7.58:1 - AA/AAA) */
+  --text-body: #475569;
+  --text-muted: #64748b; /* Muted / Slate 500 (4.76:1 - passes AA) */
+  --outline: #64748b;
+  --outline-variant: #cbd5e1;
+  --border-subtle: rgba(203, 213, 225, 0.85);
+
+  /* Inverse Tokens */
+  --inverse-surface: #1e293b;
+  --inverse-on-surface: #f8fafc;
+  --inverse-primary: #93c5fd;
+
+  /* Primary Brand — Azure & Royal Blue */
+  --primary: #2563eb; /* Accessible Primary (5.17:1 with #FFF) */
+  --primary-main: #3b82f6; /* Vibrant Brand Accent */
+  --primary-light: #60a5fa;
+  --primary-dark: #1d4ed8; /* Hover / Active State (6.70:1) */
+  --on-primary: #ffffff;
+  --primary-container: #eff6ff;
+  --on-primary-container: #1e40af; /* 8.32:1 on #EFF6FF */
+  --primary-fixed: #dbeafe;
+  --primary-fixed-dim: #93c5fd;
+  --on-primary-fixed: #172554;
+  --on-primary-fixed-variant: #1e40af;
+  --surface-tint: #2563eb;
+
+  /* Secondary — Lavender Wash (AI Intelligence & Semantic Analysis) */
+  --secondary: #7c3aed; /* 5.70:1 with #FFF */
+  --secondary-main: #8b5cf6;
+  --secondary-light: #c4b5fd;
+  --on-secondary: #ffffff;
+  --secondary-container: #ede9fe;
+  --on-secondary-container: #5b21b6; /* 7.95:1 on #EDE9FE */
+  --secondary-fixed: #ede9fe;
+  --secondary-fixed-dim: #c4b5fd;
+  --on-secondary-fixed: #2e1065;
+  --on-secondary-fixed-variant: #5b21b6;
+
+  /* Tertiary — Fresh Mint (Positive Score & Optimal Voice Signal) */
+  --tertiary: #059669; /* 3.76:1 on white, use #047857 for text */
+  --tertiary-main: #34d399;
+  --tertiary-dark: #047857; /* 5.48:1 with #FFF */
+  --on-tertiary: #ffffff;
+  --tertiary-container: #ecfdf5;
+  --on-tertiary-container: #065f46; /* 7.64:1 on #ECFDF5 */
+  --tertiary-fixed: #a7f3d0;
+  --tertiary-fixed-dim: #34d399;
+  --on-tertiary-fixed: #022c22;
+  --on-tertiary-fixed-variant: #065f46;
+
+  /* Warm Coral / Peach & Error (Needs Focus & Gentle Alerts) */
+  --error: #e11d48; /* 4.70:1 with #FFF */
+  --coral-main: #fda4af;
+  --coral-accent: #f43f5e;
+  --on-error: #ffffff;
+  --error-container: #fff1f2;
+  --on-error-container: #9f1239; /* 8.15:1 on #FFF1F2 */
+
+  /* Soft Amber (Processing & Improvement Suggestions) */
+  --warning-main: #fbbf24;
+  --warning-dark: #d97706;
+  --warning-container: #fef3c7;
+  --on-warning-container: #92400e; /* 7.42:1 on #FEF3C7 */
+
+  /* Ambient Orbs (Diffused Radial Gradients) */
+  --orb-azure: rgba(59, 130, 246, 0.12);
+  --orb-lavender: rgba(196, 181, 253, 0.14);
+  --orb-mint: rgba(52, 211, 153, 0.1);
+  --orb-peach: rgba(253, 164, 175, 0.1);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(
+    135deg,
+    #2563eb 0%,
+    #3b82f6 55%,
+    #60a5fa 100%
+  );
+  --gradient-ai-ring: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-soundwave: linear-gradient(180deg, #60a5fa 0%, #a78bfa 100%);
+
+  /* ------------------------------------------------------------------------
+     2. TYPOGRAPHY TOKENS (Vietnamese Diacritic Optimized)
+     ------------------------------------------------------------------------ */
+  --font-sans:
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+
+  /* Display (48px / 58px) */
+  --fs-display: 3rem;
+  --lh-display: 3.625rem;
+  --ls-display: -0.025em;
+  --fw-display: 800;
+
+  /* Headline Large Desktop (36px / 44px) */
+  --fs-headline-lg: 2.25rem;
+  --lh-headline-lg: 2.75rem;
+  --ls-headline-lg: -0.02em;
+  --fw-headline-lg: 700;
+
+  /* Headline Large Mobile (28px / 36px) */
+  --fs-headline-lg-mobile: 1.75rem;
+  --lh-headline-lg-mobile: 2.25rem;
+  --ls-headline-lg-mobile: -0.015em;
+
+  /* Headline Medium (24px / 32px) */
+  --fs-headline-md: 1.5rem;
+  --lh-headline-md: 2rem;
+  --ls-headline-md: -0.015em;
+  --fw-headline-md: 700;
+
+  /* Headline Small (20px / 28px) */
+  --fs-headline-sm: 1.25rem;
+  --lh-headline-sm: 1.75rem;
+  --ls-headline-sm: -0.01em;
+  --fw-headline-sm: 600;
+
+  /* Body Scales (Line-height 1.55x - 1.625x for Vietnamese accents) */
+  --fs-body-lg: 1.125rem; /* 18px */
+  --lh-body-lg: 1.75rem; /* 28px */
+  --fs-body-md: 1rem; /* 16px */
+  --lh-body-md: 1.625rem; /* 26px */
+  --fs-body-sm: 0.875rem; /* 14px */
+  --lh-body-sm: 1.375rem; /* 22px */
+
+  /* Labels */
+  --fs-label-lg: 0.875rem; /* 14px */
+  --lh-label-lg: 1.25rem; /* 20px */
+  --ls-label-lg: 0.01em;
+  --fs-label-md: 0.75rem; /* 12px */
+  --lh-label-md: 1rem; /* 16px */
+  --ls-label-md: 0.02em;
+  --fs-label-caps: 0.6875rem; /* 11px */
+  --lh-label-caps: 1rem; /* 16px */
+  --ls-label-caps: 0.06em;
+
+  /* ------------------------------------------------------------------------
+     3. LAYOUT, GRID & SPACING TOKENS
+     ------------------------------------------------------------------------ */
+  --canvas-ideal-width: 1440px;
+  --container-max-width: 1280px;
+
+  --grid-columns: 12;
+  --grid-gutter-mobile: 1rem; /* 16px */
+  --grid-gutter-tablet: 1.5rem; /* 24px */
+  --grid-gutter-desktop: 2rem; /* 32px */
+  --grid-margin-mobile: 1rem; /* 16px */
+  --grid-margin-tablet: 2rem; /* 32px */
+  --grid-margin-desktop: 3rem; /* 48px */
+
+  --space-xs: 0.25rem; /* 4px */
+  --space-sm: 0.5rem; /* 8px */
+  --space-md: 1rem; /* 16px */
+  --space-lg: 1.5rem; /* 24px */
+  --space-xl: 2.5rem; /* 40px */
+
+  /* ------------------------------------------------------------------------
+     4. SHAPE & BORDER RADIUS TOKENS
+     ------------------------------------------------------------------------ */
+  --radius-xs: 0.375rem; /* 6px - Checkboxes */
+  --radius-sm: 0.5rem; /* 8px - Mini badges & tooltips */
+  --radius-md-input: 1rem; /* 16px - Form inputs & selectors */
+  --radius-lg-card: 1.5rem; /* 24px - Primary modules & coaching cards */
+  --radius-xl: 3rem; /* 48px */
+  --radius-full: 9999px; /* Pill buttons, tags, soundwave bars */
+
+  /* ------------------------------------------------------------------------
+     5. LUMINOUS CHROMATIC ELEVATION TOKENS
+     ------------------------------------------------------------------------ */
+  --shadow-level-0: none;
+  --shadow-level-1:
+    0 4px 16px -2px rgba(59, 130, 246, 0.06),
+    0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --shadow-level-2:
+    0 12px 32px -4px rgba(59, 130, 246, 0.12),
+    0 4px 12px -2px rgba(59, 130, 246, 0.04);
+  --shadow-level-3:
+    0 20px 40px -6px rgba(59, 130, 246, 0.22),
+    0 8px 16px -3px rgba(37, 99, 235, 0.1);
+  --focus-ring: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+/* ==========================================================================
+   6. DARK MODE TOKENS ([data-theme="dark"] & .dark)
+   Calibrated for Night-Time Interview Practice with Soft Luminous Surfaces
+   ========================================================================== */
+[data-theme="dark"],
+.dark {
+  --surface: #0b0f19;
+  --surface-dim: #070a12;
+  --surface-bright: #1e293b;
+  --surface-container-lowest: #070a12;
+  --surface-container-low: #0f172a;
+  --surface-container: #1e293b;
+  --surface-container-high: #283548;
+  --surface-container-highest: #334155;
+  --surface-variant: #1e293b;
+  --background: #0b0f19;
+
+  /* Frosted Dark Glass */
+  --glass-surface: rgba(15, 23, 42, 0.78);
+  --glass-surface-elevated: rgba(30, 41, 59, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Typography & Neutrals (WCAG 2.1 AA on Dark Surfaces) */
+  --on-surface: #f8fafc;
+  --on-background: #f8fafc;
+  --text-heading: #f8fafc;
+  --text-subheading: #e2e8f0;
+  --on-surface-variant: #cbd5e1;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8; /* 6.45:1 on #0F172A - passes AA */
+  --outline: #64748b;
+  --outline-variant: #334155;
+  --border-subtle: rgba(51, 65, 85, 0.85);
+
+  --inverse-surface: #f8fafc;
+  --inverse-on-surface: #0f172a;
+  --inverse-primary: #2563eb;
+
+  /* Primary Brand in Dark Mode */
+  --primary: #3b82f6;
+  --primary-main: #60a5fa;
+  --primary-light: #93c5fd;
+  --primary-dark: #2563eb;
+  --on-primary: #ffffff;
+  --primary-container: rgba(37, 99, 235, 0.22);
+  --on-primary-container: #bfdbfe;
+  --surface-tint: #60a5fa;
+
+  /* Secondary — Lavender Wash (Dark) */
+  --secondary: #8b5cf6;
+  --secondary-main: #a78bfa;
+  --secondary-light: #ddd6fe;
+  --on-secondary: #ffffff;
+  --secondary-container: rgba(139, 92, 246, 0.2);
+  --on-secondary-container: #ddd6fe;
+
+  /* Tertiary — Fresh Mint (Dark) */
+  --tertiary: #10b981;
+  --tertiary-main: #34d399;
+  --tertiary-dark: #059669;
+  --on-tertiary: #022c22;
+  --tertiary-container: rgba(16, 185, 129, 0.18);
+  --on-tertiary-container: #a7f3d0;
+
+  /* Warm Coral / Error (Dark) */
+  --error: #f43f5e;
+  --coral-main: #fda4af;
+  --coral-accent: #fb7185;
+  --on-error: #ffffff;
+  --error-container: rgba(244, 63, 94, 0.18);
+  --on-error-container: #fecdd3;
+
+  /* Soft Amber (Dark) */
+  --warning-main: #fbbf24;
+  --warning-dark: #f59e0b;
+  --warning-container: rgba(245, 158, 11, 0.18);
+  --on-warning-container: #fde68a;
+
+  /* Ambient Orbs (Dark) */
+  --orb-azure: rgba(59, 130, 246, 0.16);
+  --orb-lavender: rgba(139, 92, 246, 0.15);
+  --orb-mint: rgba(16, 185, 129, 0.12);
+  --orb-peach: rgba(244, 63, 94, 0.12);
+
+  /* Luminous Dark Shadows */
+  --shadow-level-1:
+    0 4px 20px -2px rgba(0, 0, 0, 0.45), 0 0 12px -2px rgba(59, 130, 246, 0.08);
+  --shadow-level-2:
+    0 12px 36px -4px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(59, 130, 246, 0.16);
+  --shadow-level-3:
+    0 20px 44px -6px rgba(0, 0, 0, 0.7), 0 0 32px -4px rgba(59, 130, 246, 0.28);
+  --focus-ring: 0 0 0 4px rgba(96, 165, 250, 0.28);
+}
+
+/* ==========================================================================
+   7. BASE RESET & GLOBAL AMBIENT CANVAS
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--text-body);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  margin: 0;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--text-body);
+  font-size: var(--fs-body-md);
+  line-height: var(--lh-body-md);
+  position: relative;
+  overflow-x: hidden;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-a {
-  color: inherit;
+/* Ambient Diffused Radial Orbs */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 20%, var(--orb-azure) 0%, transparent 45%),
+    radial-gradient(circle at 85% 15%, var(--orb-lavender) 0%, transparent 40%),
+    radial-gradient(circle at 75% 85%, var(--orb-mint) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, var(--orb-peach) 0%, transparent 40%);
+  filter: blur(80px);
+}
+
+/* ==========================================================================
+   8. TYPOGRAPHY UTILITY CLASSES
+   ========================================================================== */
+.text-display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--ls-display);
+  color: var(--text-heading);
+}
+
+.text-headline-lg {
+  font-size: var(--fs-headline-lg-mobile);
+  line-height: var(--lh-headline-lg-mobile);
+  font-weight: var(--fw-headline-lg);
+  letter-spacing: var(--ls-headline-lg-mobile);
+  color: var(--text-heading);
+}
+
+@media (min-width: 768px) {
+  .text-headline-lg {
+    font-size: var(--fs-headline-lg);
+    line-height: var(--lh-headline-lg);
+    letter-spacing: var(--ls-headline-lg);
+  }
+}
+
+.text-headline-md {
+  font-size: var(--fs-headline-md);
+  line-height: var(--lh-headline-md);
+  font-weight: var(--fw-headline-md);
+  letter-spacing: var(--ls-headline-md);
+  color: var(--text-heading);
+}
+
+.text-headline-sm {
+  font-size: var(--fs-headline-sm);
+  line-height: var(--lh-headline-sm);
+  font-weight: var(--fw-headline-sm);
+  letter-spacing: var(--ls-headline-sm);
+  color: var(--text-subheading);
+}
+
+.text-body-lg {
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  font-weight: 400;
+}
+
+.text-body-md {
+  font-size: var(--fs-body-md);
+  line-height: var(--lh-body-md);
+  font-weight: 400;
+}
+
+.text-body-sm {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+  font-weight: 400;
+}
+
+.text-label-lg {
+  font-size: var(--fs-label-lg);
+  line-height: var(--lh-label-lg);
+  font-weight: 600;
+  letter-spacing: var(--ls-label-lg);
+}
+
+.text-label-md {
+  font-size: var(--fs-label-md);
+  line-height: var(--lh-label-md);
+  font-weight: 600;
+  letter-spacing: var(--ls-label-md);
+}
+
+.text-label-caps {
+  font-size: var(--fs-label-caps);
+  line-height: var(--lh-label-caps);
+  font-weight: 700;
+  letter-spacing: var(--ls-label-caps);
+  text-transform: uppercase;
+}
+
+/* Tabular Numbers for Live Interview Counters & Scores */
+.metric-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   9. RESPONSIVE 12-COLUMN FLUID GRID & LAYOUT CONTAINERS
+   ========================================================================== */
+.container-studio {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--grid-margin-mobile);
+}
+
+.grid-studio {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--grid-gutter-mobile);
+}
+
+@media (min-width: 768px) {
+  .container-studio {
+    padding-inline: var(--grid-margin-tablet);
+  }
+  .grid-studio {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gutter-tablet);
+  }
+}
+
+@media (min-width: 1200px) {
+  .container-studio {
+    padding-inline: var(--grid-margin-desktop);
+  }
+  .grid-studio {
+    gap: var(--grid-gutter-desktop);
+  }
+}
+
+/* ==========================================================================
+   10. GLASSMORPHISM & ELEVATION SURFACES
+   ========================================================================== */
+.surface-sunk {
+  background-color: var(--surface-container);
+  box-shadow: var(--shadow-level-0);
+  border-radius: var(--radius-md-input);
+}
+
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-level-1);
+  border-radius: var(--radius-lg-card);
+}
+
+.coaching-card {
+  background: var(--glass-surface-elevated);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-level-2);
+  border-radius: var(--radius-lg-card);
+  padding: var(--space-lg);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* ==========================================================================
+   11. CORE COMPONENTS
+   ========================================================================== */
+
+/* --- 11.1 Pill Buttons --- */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 28px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: var(--fs-label-lg);
+  line-height: var(--lh-label-lg);
+  font-weight: 600;
+  letter-spacing: var(--ls-label-lg);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-pill:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn-pill-primary {
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-level-2);
+}
+
+.btn-pill-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-level-3);
+}
+
+.btn-pill-primary:active {
+  transform: translateY(0);
+}
+
+.btn-pill-secondary {
+  background-color: var(--surface-container-lowest);
+  color: var(--text-subheading);
+  border: 1.5px solid var(--outline-variant);
+  box-shadow: var(--shadow-level-1);
+}
+
+.btn-pill-secondary:hover {
+  background-color: var(--primary-container);
+  border-color: var(--primary-fixed-dim);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* --- 11.2 AI Coach Avatar & Status Ring --- */
+.ai-avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  padding: 3px;
+  background: var(--gradient-ai-ring);
+  box-shadow: var(--shadow-level-2);
+}
+
+.ai-avatar-wrapper.sm {
+  width: 48px;
+  height: 48px;
+}
+
+.ai-avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-container-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ai-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background-color: var(--tertiary);
+  border: 2px solid var(--surface-container-lowest);
+}
+
+/* --- 11.3 Voice & Audio Visualizer --- */
+.soundwave-visualizer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 var(--space-sm);
+}
+
+.soundwave-bar {
+  width: 3px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-soundwave);
+  animation: soundwave-bounce 1.1s ease-in-out infinite;
+}
+
+.soundwave-bar:nth-child(2n) {
+  animation-delay: 0.18s;
+}
+.soundwave-bar:nth-child(3n) {
+  animation-delay: 0.35s;
+}
+.soundwave-bar:nth-child(4n) {
+  animation-delay: 0.52s;
+}
+
+@keyframes soundwave-bounce {
+  0%,
+  100% {
+    height: 8px;
+  }
+  50% {
+    height: 32px;
+  }
+}
+
+.btn-record-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--error);
+  color: var(--on-error);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  animation: record-pulse 2s infinite;
+}
+
+@keyframes record-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(244, 63, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+/* --- 11.4 Chips & Feedback Badges (WCAG 2.1 AA Compliant) --- */
+.badge-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-label-md);
+  line-height: var(--lh-label-md);
+  font-weight: 600;
+  letter-spacing: var(--ls-label-md);
+}
+
+/* High Score / Strength */
+.badge-high-score {
+  background-color: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+}
+
+/* Needs Focus / Area for Improvement */
+.badge-needs-focus {
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+  border: 1px solid rgba(244, 63, 94, 0.28);
+}
+
+/* AI Smart Hint */
+.badge-ai-hint {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+}
+
+/* Soft Amber / Processing */
+.badge-amber {
+  background-color: var(--warning-container);
+  color: var(--on-warning-container);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* --- 11.5 Input Fields & Selectors --- */
+.input-career,
+.select-career,
+.textarea-career {
+  width: 100%;
+  background-color: var(--surface-container-lowest);
+  color: var(--text-heading);
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md-input);
+  padding: 14px 18px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-md);
+  line-height: var(--lh-body-md);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input-career::placeholder,
+.textarea-career::placeholder {
+  color: var(--text-muted);
+  font-size: var(--fs-label-lg);
+  font-weight: 500;
+}
+
+.input-career:focus,
+.select-career:focus,
+.textarea-career:focus {
+  outline: none;
+  border-color: var(--primary-main);
+  box-shadow: var(--focus-ring);
+}
+
+/* --- 11.6 Interactive Checkboxes & Dual Pill Switch --- */
+.checkbox-career {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-xs);
+  background-color: var(--surface-container-lowest);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.checkbox-career:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox-career:checked::before {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--on-primary);
+  border-bottom: 2px solid var(--on-primary);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+.checkbox-career:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Dual Pill Mode Switch (Video vs Audio-Only Interview) */
+.pill-switch {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  background-color: var(--surface-container);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  gap: 4px;
+}
+
+.pill-switch-option {
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-label-lg);
+  font-weight: 600;
+  color: var(--text-body);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pill-switch-option[aria-checked="true"],
+.pill-switch-option.active {
+  background-color: var(--surface-container-lowest);
+  color: var(--primary);
+  box-shadow: var(--shadow-level-1);
 }
