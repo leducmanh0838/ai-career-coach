@@ -12,7 +12,10 @@ class CustomUserAdmin(UserAdmin):
         "role",
         "phone_number",
         "is_staff",
+        "is_active",
     )
+    list_filter = ("role", "is_staff", "is_active")
+    search_fields = ("username", "email", "phone_number")
 
     fieldsets = UserAdmin.fieldsets + (
         (
