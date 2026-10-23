@@ -1,13 +1,18 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 from django.db import models
-from pgvector.django import VectorField, HnswIndex
+from pgvector.django import HnswIndex, VectorField
+
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 
 class CustomUser(AbstractUser):
-    """Custom User model extending Django's AbstractUser to support
-
-    AI Career Coach roles (e.g., Student, Recruiter) and additional attributes.
-    """
+    """Custom User model for AI Career Coach."""
 
     ROLE_CHOICES = (
         ("student", "Sinh viên"),
@@ -21,12 +26,14 @@ class CustomUser(AbstractUser):
         default="student",
         verbose_name="Vai trò người dùng",
     )
+
     phone_number = models.CharField(
         max_length=15,
         blank=True,
         null=True,
         verbose_name="Số điện thoại",
     )
+
     avatar_url = models.URLField(
         blank=True,
         null=True,
@@ -44,84 +51,258 @@ class CustomUser(AbstractUser):
 
 
 class Skill(models.Model):
-    """Standardized Skill Taxonomy table for AI Career Coach system.
+    """Bảng lưu trữ danh sách kỹ năng, kiến thức chuẩn."""
 
-    Stores canonical skills and their synonyms.
-    """
+    id = models.CharField(
+        max_length=500,
+        primary_key=True,
+        default=generate_uuid,
+        verbose_name="Mã định danh (URI hoặc UUID)",
+    )
 
     name = models.CharField(
-        max_length=255, unique=True, verbose_name="Tên kỹ năng chuẩn"
+        max_length=255,
+        db_index=True,
+        verbose_name="Tên kỹ năng (EN)",
     )
-    synonyms = models.JSONField(
-        default=list,
+
+    skill_type = models.CharField(
+        max_length=100,
         blank=True,
-        verbose_name="Danh sách từ đồng nghĩa (JSON list)",
+        null=True,
+        verbose_name="Loại kỹ năng",
     )
+
+    reuse_level = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Mức độ tái sử dụng",
+    )
+
+    synonyms = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Từ đồng nghĩa (EN)",
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Mô tả chi tiết (EN)",
+    )
+
+    name_vi = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        db_index=True,
+        verbose_name="Tên kỹ năng (VI)",
+    )
+
+    synonyms_vi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Từ đồng nghĩa (VI)",
+    )
+
+    description_vi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Mô tả chi tiết (VI)",
+    )
+
+    is_verified = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Đã được xác thực bởi con người",
+    )
+
     embedding = VectorField(
         dimensions=1536,
         null=True,
         blank=True,
-        verbose_name="Vector embedding"
+        verbose_name="Vector Embedding",
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name="Ngày tạo"
-    )
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+
+    def __str__(self):
+        return self.name_vi or self.name
 
     class Meta:
-        verbose_name = "Kỹ năng chuẩn"
-        verbose_name_plural = "Danh mục kỹ năng chuẩn"
-
         indexes = [
             HnswIndex(
                 fields=["embedding"],
                 name="skill_embedding_hnsw_idx",
                 m=16,
                 ef_construction=64,
-                opclasses=["vector_cosine_ops"]
-            )
+                opclasses=["vector_cosine_ops"],
+            ),
+            GinIndex(
+                SearchVector(
+                    "name",
+                    "synonyms",
+                    config="simple",
+                ),
+                name="skill_fulltext_idx",
+            ),
         ]
 
+
+class Occupation(models.Model):
+    """Bảng lưu trữ danh sách nghề nghiệp chuẩn."""
+
+    id = models.CharField(
+        max_length=500,
+        primary_key=True,
+        default=generate_uuid,
+        verbose_name="Mã định danh (URI hoặc UUID)",
+    )
+
+    code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        db_index=True,
+        verbose_name="Mã nghề nghiệp",
+    )
+
+    # Dữ liệu gốc từ ESCO
+    name = models.CharField(
+        max_length=255,
+        db_index=True,
+        verbose_name="Tên nghề nghiệp (EN)",
+    )
+
+    synonyms = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Tên gọi khác (EN)",
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Mô tả công việc (EN)",
+    )
+
+    # Dữ liệu tiếng Việt do hệ thống dịch/bổ sung
+    name_vi = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        db_index=True,
+        verbose_name="Tên nghề nghiệp (VI)",
+    )
+
+    synonyms_vi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Tên gọi khác (VI)",
+    )
+
+    description_vi = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Mô tả công việc (VI)",
+    )
+
+    is_verified = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Đã được xác thực bởi con người",
+    )
+
+    embedding = VectorField(
+        dimensions=1536,
+        null=True,
+        blank=True,
+        verbose_name="Vector Embedding",
+    )
+
     def __str__(self):
-        return self.name
+        return self.name_vi or self.name
+
+    class Meta:
+        indexes = [
+            HnswIndex(
+                fields=["embedding"],
+                name="occ_embedding_hnsw_idx",
+                m=16,
+                ef_construction=64,
+                opclasses=["vector_cosine_ops"],
+            ),
+            GinIndex(
+                SearchVector(
+                    "name",
+                    "synonyms",
+                    config="simple",
+                ),
+                name="occ_fulltext_idx",
+            ),
+        ]
 
 
-class SkillLevelDetail(models.Model):
-    """Detailed content for each skill level (1 through 4), including reference
+class OccupationSkillRelation(models.Model):
+    """Bảng trung gian ánh xạ nghề nghiệp với kỹ năng."""
 
-    materials and interview questions.
-    """
-
-    LEVEL_CHOICES = (
-        (1, "Cơ bản (Beginner)"),
-        (2, "Trung bình (Intermediate)"),
-        (3, "Nâng cao (Advanced)"),
-        (4, "Chuyên gia (Expert)"),
+    occupation = models.ForeignKey(
+        Occupation,
+        on_delete=models.CASCADE,
+        related_name="required_skills",
+        verbose_name="Nghề nghiệp",
     )
 
     skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE,
-        related_name="level_details",
-        verbose_name="Kỹ năng chuẩn",
+        related_name="required_by_occupations",
+        verbose_name="Kỹ năng yêu cầu",
     )
-    level = models.IntegerField(choices=LEVEL_CHOICES, verbose_name="Mức độ")
-    description = models.TextField(
-        blank=True, verbose_name="Mô tả chi tiết năng lực ở mức độ này"
-    )
-    questions = models.JSONField(
-        default=list,
-        blank=True,
-        verbose_name="Bộ câu hỏi phỏng vấn (JSON list)",
-    )
-    documents = models.JSONField(
-        default=list, blank=True, verbose_name="Tài liệu học tập (JSON list)"
+
+    relation_type = models.CharField(
+        max_length=50,
+        verbose_name="Loại quan hệ (Bắt buộc/Tùy chọn)",
     )
 
     class Meta:
-        unique_together = ("skill", "level")
-        verbose_name = "Chi tiết cấp độ kỹ năng"
-        verbose_name_plural = "Chi tiết các cấp độ kỹ năng"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["occupation", "skill", "relation_type"],
+                name="uniq_occupation_skill_relation",
+            ),
+        ]
 
     def __str__(self):
-        return f"{self.skill.name} - Mức độ {self.level}"
+        return (
+            f"{self.occupation.name} -> "
+            f"{self.skill.name} ({self.relation_type})"
+        )
+
+
+class SkillDependency(models.Model):
+    """Bảng lưu quan hệ giữa các kỹ năng."""
+
+    source_skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        related_name="outgoing_relations",
+        verbose_name="Kỹ năng gốc",
+    )
+
+    related_skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        related_name="incoming_relations",
+        verbose_name="Kỹ năng liên quan",
+    )
+
+    relation_type = models.CharField(
+        max_length=50,
+        verbose_name="Loại quan hệ kỹ năng",
+    )
+
+    def __str__(self):
+        return (
+            f"{self.source_skill.name} relates to "
+            f"{self.related_skill.name}"
+        )
