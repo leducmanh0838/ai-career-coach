@@ -36,5 +36,8 @@ else:
     print('Superuser already exists.')
 "
 
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+
 # Khởi động Django Server ở cổng 8001
 exec python manage.py runserver 0.0.0.0:8001
