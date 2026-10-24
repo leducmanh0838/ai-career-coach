@@ -1,0 +1,118 @@
+--- Page 1 ---
+KIM PHÚ FOOD                                                           
+                                                                                  
+          AI Engineer                                                             
+                                                                                  
+          Chuyên Viên Triển Khai & Vận Hành AI Agent (Python, n8n, LLM API)       
+                                                                                  
+                                                                                  
+                                                                                  
+         Mức lương       Địa điểm         Kinh nghiệm     Hạn ứng tuyển           
+         Thỏa thuận      Hà Nội           2 năm           22/11/2026              
+                                                                                  
+       TỔNG QUAN VỊ TRÍ                                                           
+                                                                                  
+       Kim Phú FOOD đang ứng dụng AI Agent vào các hoạt động kinh doanh, Marketing, quản lý KOC, chăm sóc
+       khách hàng và thương mại điện tử. Chúng tôi tìm kiếm một nhân sự kỹ thuật có khả năng cài đặt, triển khai,
+       quản lý và tối ưu các hệ thống AI Agent, giúp tự động hóa quy trình và nâng cao hiệu suất vận hành doanh
+                                                                                  
+       nghiệp.                                                                    
+                                                                                  
+       MÔ TẢ CÔNG VIỆC                                                            
+       1. Triển khai AI Agent                                                     
+                                                                                  
+         Cài đặt, cấu hình và triển khai các AI Agent theo yêu cầu.               
+         Tùy chỉnh workflow, prompt, công cụ và kết nối dữ liệu.                  
+         Tích hợp AI với Google Sheets, Drive, Zalo, các hệ thống bán hàng và nền tảng nội bộ thông qua kết nối được
+                                                                                  
+         cấp quyền.                                                               
+         Xây dựng automation cho các bộ phận Sale, Marketing, KOC và CSKH.        
+                                                                                  
+       2. Vận hành hệ thống                                                       
+         Theo dõi, quản lý và duy trì hoạt động của các AI Agent.                 
+         Kiểm tra log, phát hiện và xử lý lỗi phát sinh.                          
+         Thiết lập lịch chạy, cảnh báo và cơ chế tự khởi động lại khi có sự cố.   
+                                                                                  
+         Quản lý API, dữ liệu, môi trường chạy và tài nguyên hệ thống.            
+         Phối hợp với các phòng ban xử lý những tình huống Agent chưa thực hiện được.
+                                                                                  
+       3. Tối ưu và phát triển                                                    
+         Nghiên cứu, thử nghiệm các công cụ AI/Automation mới.                    
+         Cải tiến chất lượng xử lý, tốc độ và độ ổn định của Agent. Tối ưu chi phí sử dụng API và tài nguyên.
+                                                                                  
+         Đề xuất giải pháp tự động hóa giúp giảm công việc thủ công. Viết tài liệu hướng dẫn và báo cáo tình trạng hệ
+         thống.                                                                   
+       4. Kết quả công việc kỳ vọng                                               
+                                                                                  
+         Quản lý và vận hành ổn định các AI Agent được phân công; khắc phục sự cố kịp thời.
+         Triển khai các workflow automation mới theo kế hoạch, tối ưu hiệu suất và chi phí.
+         Chuẩn hóa tài liệu để hệ thống có thể bảo trì và bàn giao dễ dàng.       
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+       Kim Phú FOOD — Thông Tin Tuyển Dụng Vị Trí AI Engineer         Trang 1 / 2
+
+--- Page 2 ---
+YÊU CẦU ỨNG VIÊN                                                           
+                                                                                  
+       Bắt buộc:                                                                  
+         Có 2–3 năm kinh nghiệm về lập trình, Automation, Backend hoặc AI Application.
+         Sử dụng tốt Python, hiểu API, Webhook, JSON và Git.                      
+                                                                                  
+         Có kinh nghiệm với n8n, Make hoặc nền tảng tự động hóa tương đương.      
+         Hiểu cách sử dụng LLM API, AI Agent và prompt engineering.               
+         Có khả năng cài đặt, cấu hình, chạy và debug các tác vụ tự động.         
+                                                                                  
+         Biết sử dụng Windows/Linux và các công cụ quản lý tiến trình cơ bản.     
+         Tư duy logic, chủ động tìm giải pháp, có khả năng làm việc độc lập.      
+                                                                                  
+       Ưu tiên:                                                                   
+         Đã xây dựng hoặc vận hành AI Agent thực tế.                              
+         Có kinh nghiệm Claude Code, OpenAI API, LangChain hoặc công cụ tương đương.
+                                                                                  
+         Biết sử dụng Playwright, Selenium hoặc Browser Automation.               
+         Có kiến thức Docker, VPS, SQL và cơ chế giám sát hệ thống.               
+         Từng triển khai automation cho E-commerce, CRM, KOC hoặc CSKH.           
+                                                                                  
+       * Không yêu cầu kinh nghiệm huấn luyện mô hình AI từ đầu. Ưu tiên khả năng triển khai sản phẩm thực tế.
+       KỸ NĂNG YÊU CẦU                                                            
+                                                                                  
+       KỸ NĂNG CẦN CÓ:                                                            
+                                                                                  
+        Python n8n LLM API Prompt Engineering RESTful API Git JSON Webhook Make / Zapier
+       KỸ NĂNG NÊN CÓ:                                                            
+                                                                                  
+        Docker Selenium / Playwright AI Agent Frameworks (LangChain, AutoGPT)     
+                                                                                  
+       QUYỀN LỢI ỨNG VIÊN                                                         
+                                                                                  
+          Thu nhập thỏa thuận theo năng lực thực tế.                              
+                                                                                  
+          Trực tiếp tham gia triển khai hệ thống AI Agent phục vụ hoạt động kinh doanh thực tế.
+          Tiếp cận các mô hình, công nghệ và công cụ AI mới nhất.                 
+                                                                                  
+          Được trao quyền đề xuất giải pháp và cải tiến hệ thống.                 
+          Cơ hội phát triển lên Senior AI Automation Engineer hoặc AI Automation Lead.
+          Các chế độ phúc lợi, thưởng hấp dẫn theo chính sách của công ty.        
+                                                                                  
+                                                                                  
+       ĐỊA ĐIỂM & THỜI GIAN LÀM VIỆC                                              
+                                                                                  
+                                                                                  
+         Địa điểm: Hà Nội — Tầng 7, số 1 ngõ 78 (Tòa Kim Ánh Building), Phường Cầu Giấy, Q. Cầu Giấy, Hà Nội.
+         Thời gian làm việc: Thứ 2 – Thứ 6 (08:00 – 17:00) | Thứ 7 làm việc cách tuần.
+                                                                                  
+                                                                                  
+                 Ứng viên nộp hồ sơ trực tuyến bằng cách chọn "Ứng tuyển ngay" trên hệ thống.
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+       Kim Phú FOOD — Thông Tin Tuyển Dụng Vị Trí AI Engineer         Trang 2 / 2
