@@ -216,7 +216,7 @@ def analyze_document_stream_mock(
         text_content: Optional[str] = None,
         doc_type: Literal["cv", "jd"] = "cv",
         skill_top_k: int = 5,
-        mock_dir: str = "mock",  # Thư mục chứa các file mẫu (mock)
+        mock_dir: str = "app/services/analyze_skill_service/mock",  # Thư mục chứa các file mẫu (mock)
         user=None,
 ) -> Generator[dict[str, Any], None, None]:
     """Hàm chạy pipeline giả lập (Mock) bằng cách đọc dữ liệu có sẵn từ thư mục debug/mock để tiết kiệm token."""
@@ -257,7 +257,7 @@ def analyze_document_stream_mock(
         return {"step": step_name, "status": "PROCESSING", "message": message}
 
     try:
-        time.sleep(1)  # Giả lập độ trễ đọc file/mạng
+        time.sleep(0.5)  # Giả lập độ trễ đọc file/mạng
 
         # [Bước 1] Đọc tài liệu (Đọc từ file text mẫu)
         text_file_path = os.path.join(mock_dir, f"step_1_{doc_type}_text.txt")
@@ -269,7 +269,7 @@ def analyze_document_stream_mock(
 
         step_1_key = f"step_1_{doc_type}_text" if pdf_file is not None else "step_1_source"
         yield update_progress(step_1_key, doc_text, "Đã đọc xong nội dung từ tài liệu (Mock)...")
-        time.sleep(1)
+        time.sleep(0.5)
 
         # [Bước 2] Trích xuất facts (Đọc từ file JSON mẫu)
         doc_label = "hồ sơ ứng tuyển (CV)" if doc_type == "cv" else "mô tả công việc (JD)"
@@ -284,13 +284,13 @@ def analyze_document_stream_mock(
 
         yield update_progress("step_2_extracted_facts", facts_data,
                               "Đã trích xuất thành công các thông tin chính từ tài liệu (Mock).")
-        time.sleep(1)
+        time.sleep(0.5)
 
         # [Bước 3] Truy xuất skill phái sinh
         yield {"step": "step_3_start", "status": "PROCESSING",
                "message": "Đang phân tích các kỹ năng chuyên môn phù hợp với vị trí công việc (Mock)..."}
         yield update_progress("step_3_derived_skills_count", 8, "Đã xác định được danh sách kỹ năng liên quan (Mock).")
-        time.sleep(1)
+        time.sleep(0.5)
 
         # [Bước 4] Candidates (Đọc từ file JSON mẫu)
         candidates_file_path = os.path.join(mock_dir, f"step_4_skill_candidates_{doc_type}.json")
@@ -304,7 +304,7 @@ def analyze_document_stream_mock(
                    "message": "Đang đối chiếu và tìm kiếm các kỹ năng trong hệ thống chuẩn hóa (Mock)..."}
             yield update_progress("step_4_skill_candidates", skill_candidates_debug,
                                   "Đã đối chiếu xong các kỹ năng cần thiết (Mock).")
-        time.sleep(1)
+        time.sleep(0.5)
 
         # [Bước 5.1 & 5.2] AI Xác minh Skill & Dynamic Expansion (Đọc từ file JSON mẫu)
         yield {"step": "step_5_start", "status": "PROCESSING",
@@ -318,7 +318,7 @@ def analyze_document_stream_mock(
 
         yield update_progress("step_5_2_skill_decisions_expanded", skill_decisions_data,
                               "Đã hoàn tất đánh giá và tổng hợp kỹ năng (Mock).")
-        time.sleep(2)
+        time.sleep(0.5)
 
         # Tổng hợp kết quả cuối cùng (Đọc từ file final result mẫu)
         final_result_file_path = os.path.join(mock_dir, f"step_5_3_final_result_{doc_type}.json")
