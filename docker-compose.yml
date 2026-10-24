@@ -51,6 +51,7 @@ services:
     environment:
       - NODE_ENV=development
       - VINEXT_NO_DEV_LOCK=1
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
     depends_on:
       - backend
     restart: always

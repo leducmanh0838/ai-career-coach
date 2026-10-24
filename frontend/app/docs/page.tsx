@@ -15,7 +15,7 @@ export default function DevDocsPage() {
     const checkBackendHealth = async () => {
         setHealth({ status: "loading" });
         try {
-            const res = await fetch("http://127.0.0.1:8001/api/health/", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/health/`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });
