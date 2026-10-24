@@ -111,7 +111,7 @@ Compose khai báo frontend tại host port `5174`, backend tại `8001`, Postgre
 ### Backend (Python/Django)
 
 - Đặt schema và quan hệ dữ liệu trong Django models; mọi thay đổi schema phải đi cùng migration phù hợp. Không sửa migration đã được áp dụng để thay đổi schema hiện tại.
-- Giữ HTTP handlers trong `health.py` gọn; đưa logic nghiệp vụ, truy vấn tìm kiếm và tích hợp ngoài vào `app/services/`. Dùng Django management command cho công việc import/export hoặc xử lý dữ liệu chạy thủ công.
+- Giữ HTTP handlers trong `health_view.py` gọn; đưa logic nghiệp vụ, truy vấn tìm kiếm và tích hợp ngoài vào `app/services/`. Dùng Django management command cho công việc import/export hoặc xử lý dữ liệu chạy thủ công.
 - Dùng Django ORM và giữ tính tương thích với PostgreSQL/`pgvector`. Không thay đổi ngầm số chiều embedding (`1536`), tên/cách dùng chỉ mục, hoặc cấu trúc quan hệ ESCO; điều chỉnh cần cập nhật model, migration và luồng sử dụng liên quan.
 - Bổ sung type hints và kiểm tra đầu vào ở ranh giới hệ thống. Xử lý lỗi tích hợp ngoài một cách rõ ràng; không trả dữ liệu thành công giả khi provider/database lỗi. Khi đổi xử lý lỗi, giữ logging phù hợp.
 - Dùng `python manage.py check` và tests mục tiêu sau khi sửa. Với thay đổi model, kiểm tra migration (`python manage.py makemigrations --check --dry-run`) và migrations cần thiết trên database cấu hình phù hợp.

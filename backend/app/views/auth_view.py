@@ -8,13 +8,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from app.serializers import GoogleLoginSerializer
+from app.serializers.auth_serializers import GoogleLoginSerializer
 
 User = get_user_model()
 
 
 class GoogleLoginAPIView(APIView):
-    permission_classes = []
     authentication_classes = []
 
     def post(self, request):
@@ -28,7 +27,8 @@ class GoogleLoginAPIView(APIView):
             idinfo = id_token.verify_oauth2_token(
                 token,
                 requests.Request(),
-                settings.GOOGLE_CLIENT_ID
+                settings.GOOGLE_CLIENT_ID,
+                clock_skew_in_seconds=10,
             )
 
             email = idinfo.get('email')
