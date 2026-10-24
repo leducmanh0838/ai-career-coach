@@ -24,6 +24,9 @@ python manage.py makemigrations
 echo "Applying migrations..."
 python manage.py migrate
 
+echo "Import data..."
+python manage.py import_esco_json
+
 # Tự động tạo tài khoản Superuser nếu chưa tồn tại
 echo "Creating superuser..."
 python manage.py shell -c "
