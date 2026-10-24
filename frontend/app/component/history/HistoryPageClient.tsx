@@ -1,57 +1,67 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { MOCK_HISTORY, PAGE_SIZE, AnalysisRecord, JobCategory } from "./HistoryMockData";
+import React, { useState, useEffect, useCallback } from "react";
+import { PAGE_SIZE, AnalysisRecord, JobCategory } from "./HistoryMockData";
+import { fetchHistory, ScoreRangeFilter } from "./historyService";
 import HistoryTable from "./HistoryTable";
+import HistoryTableSkeleton from "./HistoryTableSkeleton";
+import EmptyStateNoAnalysis from "./EmptyStateNoAnalysis";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 
-type ScoreFilter = "all" | "optimal" | "promising" | "gap";
-
 export default function HistoryPageClient() {
+  // Filter & Search states
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<JobCategory | "all">("all");
-  const [selectedScore, setSelectedScore] = useState<ScoreFilter>("all");
+  const [selectedScore, setSelectedScore] = useState<ScoreRangeFilter>("all");
   const [showFilterPanel, setShowFilterPanel] = useState(false);
 
-  // Filter logic
-  const filteredRecords = useMemo(() => {
-    return MOCK_HISTORY.filter((item) => {
-      // Text search matching position, company, or date
-      const query = searchQuery.trim().toLowerCase();
-      const matchesText =
-        !query ||
-        item.position.toLowerCase().includes(query) ||
-        item.company.toLowerCase().includes(query) ||
-        item.date.includes(query);
+  // Data & Request states
+  const [records, setRecords] = useState<AnalysisRecord[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-      // Category filter
-      const matchesCategory =
-        selectedCategory === "all" || item.category === selectedCategory;
+  // Debounce search query by 350ms to prevent spamming requests on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
 
-      // Score filter
-      let matchesScore = true;
-      if (selectedScore === "optimal") {
-        matchesScore = item.matchScore >= 80;
-      } else if (selectedScore === "promising") {
-        matchesScore = item.matchScore >= 50 && item.matchScore < 80;
-      } else if (selectedScore === "gap") {
-        matchesScore = item.matchScore < 50;
-      }
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-      return matchesText && matchesCategory && matchesScore;
-    });
-  }, [searchQuery, selectedCategory, selectedScore]);
+  // Load history data from API service
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-  // Pagination calculation
-  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / PAGE_SIZE));
-  const validCurrentPage = Math.min(currentPage, totalPages);
+    try {
+      const response = await fetchHistory({
+        page: currentPage,
+        pageSize: PAGE_SIZE,
+        search: debouncedSearch,
+        category: selectedCategory,
+        scoreRange: selectedScore,
+      });
 
-  const paginatedRecords = useMemo(() => {
-    const start = (validCurrentPage - 1) * PAGE_SIZE;
-    return filteredRecords.slice(start, start + PAGE_SIZE);
-  }, [filteredRecords, validCurrentPage]);
+      setRecords(response.records);
+      setTotalRecords(response.total);
+    } catch (err: any) {
+      console.error("Error fetching analysis history:", err);
+      setError(
+        err?.message || "Không thể tải dữ liệu lịch sử phân tích. Vui lòng thử lại sau."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, debouncedSearch, selectedCategory, selectedScore]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Handlers
   const handleSearchChange = (val: string) => {
@@ -61,6 +71,7 @@ export default function HistoryPageClient() {
 
   const handleClearFilters = () => {
     setSearchQuery("");
+    setDebouncedSearch("");
     setSelectedCategory("all");
     setSelectedScore("all");
     setCurrentPage(1);
@@ -70,6 +81,8 @@ export default function HistoryPageClient() {
     searchQuery.trim() !== "" ||
     selectedCategory !== "all" ||
     selectedScore !== "all";
+
+  const totalPages = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
 
   return (
     <main className="min-h-screen bg-bg text-text antialiased py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
@@ -226,9 +239,62 @@ export default function HistoryPageClient() {
         )}
 
         {/* Main Card */}
-        <div className="bg-surface rounded-2xl md:rounded-[24px] border border-border shadow-xs p-4 sm:p-6 lg:p-8">
-          {filteredRecords.length === 0 ? (
-            /* Empty State */
+        <div className="bg-surface rounded-2xl md:rounded-[24px] border border-border shadow-xs p-4 sm:p-6 lg:p-8 min-h-[380px] flex flex-col justify-center">
+          {/* Trạng thái 1: Đang tải dữ liệu (Loading Skeleton) */}
+          {isLoading ? (
+            <HistoryTableSkeleton rows={7} />
+          ) : error ? (
+            /* Trạng thái 2: Lỗi kết nối / API error */
+            <div className="py-12 text-center space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 border border-rose-200/60 flex items-center justify-center text-rose-500 shadow-2xs">
+                <svg
+                  className="w-7 h-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-text">
+                  Không thể tải lịch sử phân tích
+                </h3>
+                <p className="text-xs sm:text-sm text-muted max-w-md mx-auto mt-1">
+                  {error}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => loadData()}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs sm:text-sm font-semibold hover:bg-primary/90 transition-colors cursor-pointer shadow-xs"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                Thử lại
+              </button>
+            </div>
+          ) : totalRecords === 0 && !isFiltered ? (
+            /* Trạng thái 3: User chưa từng phân tích lần nào (Empty State đúng theo ảnh thiết kế) */
+            <EmptyStateNoAnalysis />
+          ) : records.length === 0 && isFiltered ? (
+            /* Trạng thái 4: Có dữ liệu nhưng bộ lọc/search không khớp kết quả nào */
             <div className="py-16 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surface-2 flex items-center justify-center text-muted">
                 <svg
@@ -262,16 +328,16 @@ export default function HistoryPageClient() {
               </button>
             </div>
           ) : (
-            /* Table & Pagination */
-            <div className="space-y-6">
+            /* Trạng thái 5: Hiển thị bảng dữ liệu & phân trang */
+            <div className="space-y-6 w-full">
               <HistoryTable
-                records={paginatedRecords}
-                totalCount={filteredRecords.length}
+                records={records}
+                totalCount={totalRecords}
               />
               <Pagination
-                currentPage={validCurrentPage}
+                currentPage={currentPage}
                 totalPages={totalPages}
-                totalRecords={filteredRecords.length}
+                totalRecords={totalRecords}
                 pageSize={PAGE_SIZE}
                 onPageChange={(page) => setCurrentPage(page)}
               />
