@@ -209,3 +209,167 @@ def analyze_document_stream(
             "message": "Rất tiếc, đã có lỗi xảy ra trong quá trình xử lý. Vui lòng thử lại sau.",
             "error": str(e)
         }
+
+
+def analyze_document_stream_mock(
+        pdf_file: Optional[UploadedFile] = None,
+        text_content: Optional[str] = None,
+        doc_type: Literal["cv", "jd"] = "cv",
+        skill_top_k: int = 5,
+        mock_dir: str = "mock",  # Thư mục chứa các file mẫu (mock)
+        user=None,
+) -> Generator[dict[str, Any], None, None]:
+    """Hàm chạy pipeline giả lập (Mock) bằng cách đọc dữ liệu có sẵn từ thư mục debug/mock để tiết kiệm token."""
+    task_type = "cv_analysis" if doc_type == "cv" else "jd_analysis"
+
+    input_payload = {
+        "has_pdf_file": bool(pdf_file),
+        "file_name": pdf_file.name if pdf_file else None,
+        "has_text": bool(text_content),
+        "doc_type": doc_type,
+        "skill_top_k": skill_top_k
+    }
+
+    # 1. Khởi tạo log PENDING trong DB
+    task_log = AITaskLog.objects.create(
+        user=user,
+        task_type=task_type,
+        status=AITaskLog.Status.PENDING,
+        model_name="mock-model",
+        input_payload=input_payload
+    )
+
+    # Gửi sự kiện khởi tạo kèm Task ID cho client
+    yield {
+        "step": "init",
+        "status": "PENDING",
+        "task_id": str(task_log.id),
+        "message": "Đang chuẩn bị hệ thống (Mock Mode)..."
+    }
+
+    step_artifacts_dict = {}
+    pipeline_start = time.time()
+
+    def update_progress(step_name: str, data, message: str):
+        step_artifacts_dict[step_name] = data
+        task_log.step_artifacts = step_artifacts_dict
+        task_log.save(update_fields=["step_artifacts", "updated_at"])
+        return {"step": step_name, "status": "PROCESSING", "message": message}
+
+    try:
+        time.sleep(1)  # Giả lập độ trễ đọc file/mạng
+
+        # [Bước 1] Đọc tài liệu (Đọc từ file text mẫu)
+        text_file_path = os.path.join(mock_dir, f"step_1_{doc_type}_text.txt")
+        if os.path.exists(text_file_path):
+            with open(text_file_path, "r", encoding="utf-8") as f:
+                doc_text = f.read()
+        else:
+            doc_text = text_content or "Mock document text content..."
+
+        step_1_key = f"step_1_{doc_type}_text" if pdf_file is not None else "step_1_source"
+        yield update_progress(step_1_key, doc_text, "Đã đọc xong nội dung từ tài liệu (Mock)...")
+        time.sleep(1)
+
+        # [Bước 2] Trích xuất facts (Đọc từ file JSON mẫu)
+        doc_label = "hồ sơ ứng tuyển (CV)" if doc_type == "cv" else "mô tả công việc (JD)"
+        yield {"step": "step_2_start", "status": "PROCESSING",
+               "message": f"Hệ thống đang đọc hiểu và phân tích nội dung từ {doc_label} (Mock)..."}
+
+        facts_file_path = os.path.join(mock_dir, f"step_2_extracted_facts_{doc_type}.json")
+        facts_data = {}
+        if os.path.exists(facts_file_path):
+            with open(facts_file_path, "r", encoding="utf-8") as f:
+                facts_data = json.load(f)
+
+        yield update_progress("step_2_extracted_facts", facts_data,
+                              "Đã trích xuất thành công các thông tin chính từ tài liệu (Mock).")
+        time.sleep(1)
+
+        # [Bước 3] Truy xuất skill phái sinh
+        yield {"step": "step_3_start", "status": "PROCESSING",
+               "message": "Đang phân tích các kỹ năng chuyên môn phù hợp với vị trí công việc (Mock)..."}
+        yield update_progress("step_3_derived_skills_count", 8, "Đã xác định được danh sách kỹ năng liên quan (Mock).")
+        time.sleep(1)
+
+        # [Bước 4] Candidates (Đọc từ file JSON mẫu)
+        candidates_file_path = os.path.join(mock_dir, f"step_4_skill_candidates_{doc_type}.json")
+        skill_candidates_debug = []
+        if os.path.exists(candidates_file_path):
+            with open(candidates_file_path, "r", encoding="utf-8") as f:
+                skill_candidates_debug = json.load(f)
+
+        if skill_candidates_debug:
+            yield {"step": "step_4_start", "status": "PROCESSING",
+                   "message": "Đang đối chiếu và tìm kiếm các kỹ năng trong hệ thống chuẩn hóa (Mock)..."}
+            yield update_progress("step_4_skill_candidates", skill_candidates_debug,
+                                  "Đã đối chiếu xong các kỹ năng cần thiết (Mock).")
+        time.sleep(1)
+
+        # [Bước 5.1 & 5.2] AI Xác minh Skill & Dynamic Expansion (Đọc từ file JSON mẫu)
+        yield {"step": "step_5_start", "status": "PROCESSING",
+               "message": "Trợ lý AI đang đánh giá mức độ thành thạo và hoàn thiện kết quả phân tích (Mock)..."}
+
+        expanded_file_path = os.path.join(mock_dir, f"step_5_2_skill_decisions_expanded_{doc_type}.json")
+        skill_decisions_data = {}
+        if os.path.exists(expanded_file_path):
+            with open(expanded_file_path, "r", encoding="utf-8") as f:
+                skill_decisions_data = json.load(f)
+
+        yield update_progress("step_5_2_skill_decisions_expanded", skill_decisions_data,
+                              "Đã hoàn tất đánh giá và tổng hợp kỹ năng (Mock).")
+        time.sleep(2)
+
+        # Tổng hợp kết quả cuối cùng (Đọc từ file final result mẫu)
+        final_result_file_path = os.path.join(mock_dir, f"step_5_3_final_result_{doc_type}.json")
+        if os.path.exists(final_result_file_path):
+            with open(final_result_file_path, "r", encoding="utf-8") as f:
+                final_result = json.load(f)
+        else:
+            final_result = skill_decisions_data
+
+        # Lưu vào DB nếu là CV và user đã đăng nhập
+        if user and user.is_authenticated and doc_type == "cv":
+            try:
+                save_student_analysis_result(user, final_result)
+            except Exception as db_err:
+                print(f"⚠️ Cảnh báo: Không thể lưu profile sinh viên vào DB: {db_err}")
+
+        total_time = time.time() - pipeline_start
+
+        # Cập nhật SUCCESS vào DB
+        task_log.status = AITaskLog.Status.SUCCESS
+        task_log.step_artifacts = step_artifacts_dict
+        task_log.output_payload = final_result
+        task_log.metrics = {
+            "execution_time_seconds": round(total_time, 2),
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+        }
+        task_log.save()
+
+        # Yield kết quả cuối cùng cho client
+        yield {
+            "step": "completed",
+            "status": "SUCCESS",
+            "task_id": str(task_log.id),
+            "message": "Phân tích tài liệu thành công (Mock Mode)!",
+            "data": final_result
+        }
+
+    except Exception as e:
+        total_time = time.time() - pipeline_start
+        task_log.status = AITaskLog.Status.FAILED
+        task_log.step_artifacts = step_artifacts_dict
+        task_log.error_message = str(e)
+        task_log.metrics = {"execution_time_seconds": round(total_time, 2)}
+        task_log.save()
+
+        yield {
+            "step": "error",
+            "status": "FAILED",
+            "task_id": str(task_log.id),
+            "message": "Rất tiếc, đã có lỗi xảy ra trong quá trình xử lý mock.",
+            "error": str(e)
+        }

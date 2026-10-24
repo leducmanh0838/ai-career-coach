@@ -1,0 +1,214 @@
+{
+  "decisions": [
+    {
+      "mention_index": 0,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+      "level": "Proficient",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'Python' in the context of programming languages strongly aligns with the ESCO skill 'Python (computer programming)'."
+    },
+    {
+      "mention_index": 1,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'SQL' in the context of programming languages matches the ESCO skill 'SQL'."
+    },
+    {
+      "mention_index": 2,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/3cd569a2-4f88-4c1e-9995-8dce8c5e51a7",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'JavaScript' in the context of programming languages aligns with the ESCO skill 'JavaScript'."
+    },
+    {
+      "mention_index": 3,
+      "matched_skill_id": "09f04178-5a1e-4c8b-9768-1f0d787a026d",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'Django' in the context of backend frameworks matches the ESCO skill 'Django'."
+    },
+    {
+      "mention_index": 4,
+      "matched_skill_id": "426b50ac-3323-496f-84e1-6ca22c38590e",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'Django REST Framework' in the context of backend frameworks aligns with the ESCO skill 'Django REST Framework'."
+    },
+    {
+      "mention_index": 5,
+      "matched_skill_id": "d8c893ad-6a83-402a-876a-c33e81bd0fa3",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'FastAPI' in the context of backend frameworks matches the ESCO skill 'FastAPI'."
+    },
+    {
+      "mention_index": 6,
+      "matched_skill_id": "b7a1a00a-55b2-418e-84a9-1d934782c2b8",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'RESTful APIs' in the context of backend frameworks aligns with the ESCO skill 'RESTful APIs'."
+    },
+    {
+      "mention_index": 7,
+      "matched_skill_id": "4fd6c9d3-b978-4a55-b8a5-df7a5c9afc85",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'Celery' in the context of backend frameworks matches the ESCO skill 'Celery'."
+    },
+    {
+      "mention_index": 8,
+      "matched_skill_id": "2f3a7f6e-bcdd-41db-a00b-064f79226edb",
+      "level": "Advanced",
+      "confidence": 0.95,
+      "reasoning": "The mention of 'Redis' in the context of backend frameworks aligns with the ESCO skill 'Redis'."
+    },
+    {
+      "mention_index": 9,
+      "matched_skill_id": "0f94c1cd-53af-4a0c-bba0-06babd1c8fb4",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'RAG' in the context of AI & LLM tools matches the ESCO skill 'RAG'."
+    },
+    {
+      "mention_index": 10,
+      "matched_skill_id": "0af7b4af-2db0-42b3-9291-385b54cb6930",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'LangChain' in the context of AI & LLM tools aligns with the ESCO skill 'LangChain'."
+    },
+    {
+      "mention_index": 11,
+      "matched_skill_id": "97ed4b98-38a8-489d-80b4-fe2a63515cfb",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'LangGraph' in the context of AI & LLM tools matches the ESCO skill 'LangGraph'."
+    },
+    {
+      "mention_index": 12,
+      "matched_skill_id": "2edd843a-f13c-424c-8b1e-32192fada415",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'RAGAS' in the context of AI & LLM tools aligns with the ESCO skill 'RAGAS'."
+    },
+    {
+      "mention_index": 13,
+      "matched_skill_id": "cc4ad96c-454d-473a-8205-b7e416327b3c",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'React' in the context of frontend frameworks matches the ESCO skill 'React'."
+    },
+    {
+      "mention_index": 14,
+      "matched_skill_id": "9760007b-495d-4222-b660-6413069e5a8c",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Next.js' in the context of frontend frameworks aligns with the ESCO skill 'Next.js'."
+    },
+    {
+      "mention_index": 15,
+      "matched_skill_id": "6c4adaec-577c-4d94-8b08-52c5823b9db1",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'HTML/CSS' in the context of frontend frameworks matches the ESCO skill 'HTML/CSS'."
+    },
+    {
+      "mention_index": 16,
+      "matched_skill_id": "5dc996ff-4dd9-4b8f-9c32-a1dacdc81426",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Tailwind CSS' in the context of frontend frameworks aligns with the ESCO skill 'Tailwind CSS'."
+    },
+    {
+      "mention_index": 17,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/a8d07b5a-c1a1-42c6-9d53-db9c7a2ca996",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'PostgreSQL' in the context of databases matches the ESCO skill 'PostgreSQL'."
+    },
+    {
+      "mention_index": 18,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/4da171e5-779c-4983-a76f-91c16751e99f",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'MySQL' in the context of databases aligns with the ESCO skill 'MySQL'."
+    },
+    {
+      "mention_index": 19,
+      "matched_skill_id": "23c1ef84-e2a8-4bf6-8a6a-bf5366f37bef",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Git' in the context of DevOps & Tools matches the ESCO skill 'Git'."
+    },
+    {
+      "mention_index": 20,
+      "matched_skill_id": "4d7ca776-a062-49ff-8044-e9eba5090f29",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Docker' in the context of DevOps & Tools aligns with the ESCO skill 'Docker'."
+    },
+    {
+      "mention_index": 21,
+      "matched_skill_id": "0b6243f9-6dc5-4b4a-af4d-bd6617407571",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'GitHub Actions' in the context of DevOps & Tools matches the ESCO skill 'GitHub Actions'."
+    },
+    {
+      "mention_index": 22,
+      "matched_skill_id": "9770d90a-0557-40ee-9cd7-25eb8b5fe483",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Linux' in the context of DevOps & Tools aligns with the ESCO skill 'Linux'."
+    },
+    {
+      "mention_index": 23,
+      "matched_skill_id": "5c29cc5a-451f-4f43-bdcc-68852b65ad7b",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Bash' in the context of DevOps & Tools matches the ESCO skill 'Bash'."
+    },
+    {
+      "mention_index": 24,
+      "matched_skill_id": "fd7102cc-ef94-4b69-bd88-0218010360f2",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Codex' in the context of AI Tools aligns with the ESCO skill 'Codex'."
+    },
+    {
+      "mention_index": 25,
+      "matched_skill_id": "6e084bf7-be25-41b3-bc81-18275f01118d",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Claude Code' in the context of AI Tools matches the ESCO skill 'Claude Code'."
+    },
+    {
+      "mention_index": 26,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/adc6dc11-3376-467b-96c5-9b0a21edc869",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Problem-Solving' in the context of soft skills aligns with the ESCO skill 'solve problems'."
+    },
+    {
+      "mention_index": 27,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/15d76317-c71a-4fa2-aadc-2ecc34e627b7",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Communication' in the context of soft skills matches the ESCO skill 'communication'."
+    },
+    {
+      "mention_index": 28,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/60c78287-22eb-4103-9c8c-28deaa460da0",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Teamwork' in the context of soft skills aligns with the ESCO skill 'work in teams'."
+    },
+    {
+      "mention_index": 29,
+      "matched_skill_id": "http://data.europa.eu/esco/skill/49de9958-2aa4-4eef-a89d-fe5d5bcd28c4",
+      "level": "Proficient",
+      "confidence": 0.9,
+      "reasoning": "The mention of 'Adaptability' in the context of soft skills matches the ESCO skill 'adapt to change'."
+    }
+  ]
+}
