@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+<<<<<<< Updated upstream
+=======
+import Header from "@/components/layout/Header";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "@/context/AuthContext";
+>>>>>>> Stashed changes
 
 export const metadata: Metadata = {
   title: "vinext on Cloudflare Workers",
