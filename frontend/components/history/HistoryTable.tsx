@@ -259,8 +259,8 @@ export default function HistoryTable({ records, totalCount }: HistoryTableProps)
                 {/* Column 4: Action */}
                 <td className="py-4 px-4 sm:px-6 align-middle text-right whitespace-nowrap">
                   <Link
-                    href={`/history/${record.id}`}
-                    className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#c25e1a] hover:text-[#9a450c] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
+                    href={`/analysis?id=${record.id}`}
+                    className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
                   >
                     <span>Xem chi tiết</span>
                     <span className="text-base leading-none transition-transform group-hover:translate-x-0.5">
