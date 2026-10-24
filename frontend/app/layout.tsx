@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./component/layout/header";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "AI Career Coach",
@@ -8,11 +10,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
+  console.info("googleClientId: ", googleClientId)
   return (
     <html lang="vi">
       <body className="min-h-screen bg-bg text-text antialiased">
-        <Header />
-        {children}
+        <AuthProvider>
+          <GoogleOAuthProvider clientId={googleClientId}>
+            <Header />
+            {children}
+          </GoogleOAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );
