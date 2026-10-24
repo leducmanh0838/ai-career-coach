@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+<<<<<<< HEAD
 import HistoryPageClient from "../component/history/HistoryPageClient";
+=======
+import HistoryPageClient from "@/components/history/HistoryPageClient";
+>>>>>>> origin/thanh
 
 export const metadata: Metadata = {
   title: "Lịch sử phân tích | AI Career Coach",

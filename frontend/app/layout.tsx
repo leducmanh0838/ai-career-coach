@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
+<<<<<<< HEAD
 import Header from "./component/layout/header";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "@/context/AuthContext";
+=======
+<<<<<<< Updated upstream
+=======
+import Header from "@/components/layout/Header";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "@/context/AuthContext";
+>>>>>>> Stashed changes
+>>>>>>> origin/thanh
 
 export const metadata: Metadata = {
   title: "AI Career Coach",
