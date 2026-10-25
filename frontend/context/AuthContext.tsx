@@ -2,42 +2,60 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 
-// 1. Định nghĩa Zod Schema cho dữ liệu thô từ Backend (snake_case)
 const backendUserSchema = z.object({
     id: z.number(),
     email: z.string(),
     first_name: z.string(),
     last_name: z.string(),
     role: z.string(),
-    avatar_url: z.string(),
+    avatar_url: z.string().nullable().optional(),
 });
 
-// 2. Transform sang chuẩn camelCase cho Frontend sử dụng
 const userSchema = backendUserSchema.transform((data) => ({
     id: data.id,
     email: data.email,
     firstName: data.first_name,
     lastName: data.last_name,
     role: data.role,
-    avatarUrl: data.avatar_url,
+    avatarUrl: data.avatar_url ?? null,
 }));
 
-// Kiểu dữ liệu TypeScript suy ra từ Zod Schema
 export type User = z.infer<typeof userSchema>;
 
 interface AuthContextType {
     user: User | null;
-    setUser: (user: User | null) => void;
-    logout: () => void;
+    setUser: (user: any | null) => void;
+    logout: () => Promise<void>;
     isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUserState] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const router = useRouter();
+
+    // Hàm setUser được bọc logic tự động parse/transform dữ liệu
+    const setUser = (incomingUser: any | null) => {
+        if (!incomingUser) {
+            setUserState(null);
+            localStorage.removeItem('user');
+            return;
+        }
+        try {
+            // Tự động chuyển đổi snake_case từ backend sang camelCase cho frontend
+            const parsedUser = userSchema.parse(incomingUser);
+            setUserState(parsedUser);
+            localStorage.setItem('user', JSON.stringify(parsedUser));
+        } catch (error) {
+            console.error("Lỗi parse dữ liệu user:", error);
+            setUserState(null);
+            localStorage.removeItem('user');
+        }
+    };
 
     useEffect(() => {
         const verifyAuth = async () => {
@@ -55,19 +73,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const data: any = await response.json();
 
                 if (response.ok && data.user) {
-                    console.info("Load user: ", JSON.stringify(data.user));
-                    // Validate và tự động transform sang camelCase bằng Zod
-                    const parsedUser = userSchema.parse(data.user);
-                    setUser(parsedUser);
-                    localStorage.setItem('user', JSON.stringify(parsedUser));
+                    setUser(data.user);
                 } else {
                     setUser(null);
-                    localStorage.removeItem('user');
                 }
             } catch (error) {
-                console.error("Lỗi xác thực phiên đăng nhập hoặc dữ liệu không khớp:", error);
+                console.error("Lỗi xác thực token:", error);
                 setUser(null);
-                localStorage.removeItem('user');
             } finally {
                 setIsLoading(false);
             }
@@ -76,10 +88,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         verifyAuth();
     }, []);
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+    const logout = async () => {
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            await fetch(`${apiUrl}/api/auth/logout/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+        } catch (error) {
+            console.error("Lỗi khi gọi API đăng xuất:", error);
+        } finally {
+            setUser(null);
+            router.push('/login');
+        }
     };
 
     return (
