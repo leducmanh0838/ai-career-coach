@@ -20,7 +20,6 @@ export default function ProfilePage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [tempFile, setTempFile] = useState<File | null>(null);
 
-  // Gom hàm fetchProfile thành useCallback để tái sử dụng gọi lại khi cần refresh
   const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/api/me/detail/`, {
@@ -28,6 +27,12 @@ export default function ProfilePage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
+
+      // Nếu lỗi xác thực (401 Unauthorized hoặc 403 Forbidden), chuyển hướng ngay về /login
+      if (res.status === 401 || res.status === 403) {
+        router.push("/login");
+        return;
+      }
 
       if (!res.ok) {
         throw new Error("Không thể tải thông tin hồ sơ. Vui lòng đăng nhập lại.");
@@ -40,7 +45,7 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     fetchProfile();
@@ -69,12 +74,20 @@ export default function ProfilePage() {
     return (
       <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg text-center text-red-600">
         <p className="font-medium">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition"
-        >
-          Thử lại
-        </button>
+        <div className="mt-4 flex justify-center gap-3">
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 transition"
+          >
+            Thử lại
+          </button>
+          <button
+            onClick={() => router.push("/login")}
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
+          >
+            Đăng nhập lại
+          </button>
+        </div>
       </div>
     );
   }
