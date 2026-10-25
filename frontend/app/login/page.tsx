@@ -1,15 +1,58 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext'; // Điều chỉnh đường dẫn import cho đúng với dự án của bạn
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setUser } = useAuth(); // Lấy hàm setUser từ AuthContext
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Hàm xử lý khi Google trả về token thành công
+  const nextUrl = searchParams.get('next') || '/';
+
+  const handleLoginSuccess = (userData: any) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    router.push(nextUrl);
+  };
+
+  // Xử lý đăng nhập bằng Username & Password
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Quan trọng để nhận HttpOnly Cookie từ Django
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data: any = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || data.error || 'Đăng nhập thất bại.');
+      }
+
+      handleLoginSuccess(data.user);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Đã có lỗi xảy ra trong quá trình đăng nhập.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Xử lý đăng nhập bằng Google
   const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
     setIsLoading(true);
     setErrorMessage('');
@@ -23,15 +66,14 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', 
+        credentials: 'include',
         body: JSON.stringify({ id_token: idToken }),
       });
 
       const data: any = await response.json();
       if (!response.ok) throw new Error(data.error || 'Đăng nhập thất bại.');
 
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/');
+      handleLoginSuccess(data.user);
     } catch (err: any) {
       setErrorMessage(err.message || 'Đã có lỗi xảy ra trong quá trình đăng nhập.');
     } finally {
@@ -40,61 +82,104 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-bg">
-      <div className="w-full max-w-md bg-surface border border-border rounded-lg p-8 shadow-sm">
-
-        {/* Header / Logo Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-soft text-primary rounded-lg mb-4 text-2xl font-bold">
-            AI
-          </div>
-          <h1 className="text-2xl font-bold text-text mb-2">AI Career Coach</h1>
-          <p className="text-sm text-muted">
-            Trợ lý định hướng nghề nghiệp và luyện phỏng vấn thông minh
-          </p>
+    <div className="w-full max-w-md bg-surface border border-border rounded-lg p-8 shadow-sm">
+      {/* Header / Logo Brand */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-soft text-primary rounded-lg mb-4 text-2xl font-bold">
+          AI
         </div>
-
-        {/* Thông báo lỗi nếu có */}
-        {errorMessage && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-sm">
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Trạng thái đang gọi API backend */}
-        {isLoading && (
-          <div className="mb-6 p-3 bg-primary-soft border border-border text-primary text-sm rounded-sm text-center font-medium animate-pulse">
-            Đang đồng bộ tài khoản với hệ thống...
-          </div>
-        )}
-
-        {/* Khung chứa nút đăng nhập Google */}
-        <div className="space-y-4">
-          <div className="text-center text-sm text-muted mb-4">
-            Đăng nhập nhanh chóng và an toàn với Google
-          </div>
-
-          {/* Component GoogleLogin chính hãng */}
-          <div className="flex justify-center w-full">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => {
-                setErrorMessage('Đăng nhập Google thất bại. Vui lòng thử lại.');
-              }}
-              theme="outline"
-              size="large"
-              width="100%"
-              shape="rectangular"
-            />
-          </div>
-        </div>
-
-        {/* Footer nhỏ */}
-        <div className="mt-8 text-center text-xs text-muted">
-          Bằng việc đăng nhập, bạn đồng ý với các điều khoản sử dụng và chính sách bảo mật của AI Career Coach.
-        </div>
-
+        <h1 className="text-2xl font-bold text-text mb-2">AI Career Coach</h1>
+        <p className="text-sm text-muted">
+          Trợ lý định hướng nghề nghiệp và luyện phỏng vấn thông minh
+        </p>
       </div>
+
+      {/* Thông báo lỗi nếu có */}
+      {errorMessage && (
+        <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-sm">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Trạng thái đang gọi API backend */}
+      {isLoading && (
+        <div className="mb-6 p-3 bg-primary-soft border border-border text-primary text-sm rounded-sm text-center font-medium animate-pulse">
+          Đang đồng bộ tài khoản với hệ thống...
+        </div>
+      )}
+
+      {/* Form Đăng nhập Username & Password */}
+      <form onSubmit={handleCredentialsSubmit} className="space-y-4 mb-6">
+        <div>
+          <label className="block text-xs font-medium text-muted mb-1">Tên đăng nhập</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            placeholder="username"
+            className="w-full px-3 py-2 border border-border rounded-md text-sm bg-bg text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-muted mb-1">Mật khẩu</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="••••••••"
+            className="w-full px-3 py-2 border border-border rounded-md text-sm bg-bg text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-2.5 px-4 bg-primary text-white font-medium rounded-md text-sm hover:opacity-90 transition disabled:opacity-50"
+        >
+          Đăng nhập
+        </button>
+      </form>
+
+      {/* Đường phân cách */}
+      <div className="relative flex py-2 items-center mb-6">
+        <div className="flex-grow border-t border-border"></div>
+        <span className="flex-shrink mx-4 text-xs text-muted">hoặc</span>
+        <div className="flex-grow border-t border-border"></div>
+      </div>
+
+      {/* Khung chứa nút đăng nhập Google */}
+      <div className="space-y-4">
+        <div className="flex justify-center w-full">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              setErrorMessage('Đăng nhập Google thất bại. Vui lòng thử lại.');
+            }}
+            theme="outline"
+            size="large"
+            width="100%"
+            shape="rectangular"
+          />
+        </div>
+      </div>
+
+      {/* Footer nhỏ */}
+      <div className="mt-8 text-center text-xs text-muted">
+        Bằng việc đăng nhập, bạn đồng ý với các điều khoản sử dụng và chính sách bảo mật của AI Career Coach.
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <main className="min-h-screen flex items-center justify-center p-4 bg-bg">
+      <Suspense fallback={<div className="text-center text-muted">Đang tải...</div>}>
+        <LoginForm />
+      </Suspense>
     </main>
   );
 }
