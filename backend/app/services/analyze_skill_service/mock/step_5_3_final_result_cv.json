@@ -92,7 +92,7 @@
       "source_name": "Celery",
       "skill_id": "4fd6c9d3-b978-4a55-b8a5-df7a5c9afc85",
       "skill_name": "Celery",
-      "level": "Advanced",
+      "level": null,
       "evidence": [
         "Backend: Django, Django REST Framework, FastAPI, RESTful APIs, Celery, Redis"
       ],
@@ -104,7 +104,7 @@
       "source_name": "Redis",
       "skill_id": "2f3a7f6e-bcdd-41db-a00b-064f79226edb",
       "skill_name": "Redis",
-      "level": "Advanced",
+      "level": null,
       "evidence": [
         "Backend: Django, Django REST Framework, FastAPI, RESTful APIs, Celery, Redis"
       ],
@@ -140,7 +140,7 @@
       "source_name": "LangGraph",
       "skill_id": "97ed4b98-38a8-489d-80b4-fe2a63515cfb",
       "skill_name": "LangGraph",
-      "level": "Proficient",
+      "level": null,
       "evidence": [
         "AI & LLM: RAG, LangChain, LangGraph, RAGAS"
       ],
@@ -152,7 +152,7 @@
       "source_name": "RAGAS",
       "skill_id": "2edd843a-f13c-424c-8b1e-32192fada415",
       "skill_name": "RAGAS",
-      "level": "Proficient",
+      "level": null,
       "evidence": [
         "AI & LLM: RAG, LangChain, LangGraph, RAGAS"
       ],

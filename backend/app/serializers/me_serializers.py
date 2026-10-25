@@ -3,6 +3,12 @@ from rest_framework import serializers
 from app.models import CustomUser, StudentProfile, Skill, StudentSkill
 
 
+class StudentProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        fields = ["profile_summary", "extracted_occupations"]
+
+
 class SkillDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
@@ -18,13 +24,23 @@ class StudentSkillSerializer(serializers.ModelSerializer):
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):
+    """Serializer cơ bản cho StudentProfile (dùng cho /me/)"""
+
     class Meta:
         model = StudentProfile
-        fields = ["profile_summary", "extracted_occupations", "updated_at"]
+        fields = ["id", "profile_summary", "extracted_occupations", "updated_at"]
+
+
+class StudentProfileDetailSerializer(StudentProfileSerializer):
+    """Serializer chi tiết cho StudentProfile, bao gồm cả danh sách kỹ năng bên trong"""
+    student_skills = StudentSkillSerializer(many=True, read_only=True)
+
+    class Meta(StudentProfileSerializer.Meta):
+        fields = StudentProfileSerializer.Meta.fields + ["student_skills"]
 
 
 class UserMeBaseSerializer(serializers.ModelSerializer):
-    """Serializer cơ bản cho /me/ (Chỉ user + student_profile, tối ưu join)"""
+    """Serializer cơ bản cho /me/ (Chỉ user + student_profile cơ bản)"""
     student_profile = StudentProfileSerializer(read_only=True)
 
     class Meta:
@@ -42,16 +58,20 @@ class UserMeBaseSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserMeDetailSerializer(UserMeBaseSerializer):
-    """Serializer đầy đủ cho /me/detail/ (Bao gồm cả danh sách kỹ năng)"""
-    student_skills = serializers.SerializerMethodField(read_only=True)
+class UserMeDetailSerializer(serializers.ModelSerializer):
+    """Serializer đầy đủ cho /me/detail/ (student_profile chứa danh sách kỹ năng)"""
+    student_profile = StudentProfileDetailSerializer(read_only=True)
 
-    class Meta(UserMeBaseSerializer.Meta):
-        fields = UserMeBaseSerializer.Meta.fields + ["student_skills"]
-
-    def get_student_skills(self, obj):
-        if hasattr(obj, "student_profile") and obj.student_profile:
-            # Lấy danh sách kỹ năng đã được prefetch sẵn từ View để tối ưu query
-            skills = obj.student_profile.student_skills.all()
-            return StudentSkillSerializer(skills, many=True).data
-        return []
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "phone_number",
+            "avatar_url",
+            "student_profile",
+        ]

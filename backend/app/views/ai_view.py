@@ -32,14 +32,14 @@ class DocumentAnalysisSSEView(APIView):
                         skill_top_k=skill_top_k,
                         user=user
                     )
-                # else:
-                #     stream_generator = analyze_document_stream(
-                #         pdf_file=pdf_file,
-                #         text_content=text_content,
-                #         doc_type=doc_type,
-                #         skill_top_k=skill_top_k,
-                #         user=user
-                #     )
+                else:
+                    stream_generator = analyze_document_stream(
+                        pdf_file=pdf_file,
+                        text_content=text_content,
+                        doc_type=doc_type,
+                        skill_top_k=skill_top_k,
+                        user=user
+                    )
 
                 for event_data in stream_generator:
                     # Định dạng chuẩn của SSE: "data: {json_string}\n\n"

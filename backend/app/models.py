@@ -173,13 +173,15 @@ class Skill(models.Model):
                 ef_construction=64,
                 opclasses=["vector_cosine_ops"],
             ),
+            # Index Full-Text Search cho Tiếng Anh (Đã có sẵn của bạn)
             GinIndex(
-                SearchVector(
-                    "name",
-                    "synonyms",
-                    config="simple",
-                ),
+                SearchVector("name", "synonyms", config="simple"),
                 name="skill_fulltext_idx",
+            ),
+            # Bổ sung thêm Index Full-Text Search cho Tiếng Việt
+            GinIndex(
+                SearchVector("name_vi", "synonyms_vi", config="simple"),
+                name="skill_fulltext_vi_idx",
             ),
         ]
 

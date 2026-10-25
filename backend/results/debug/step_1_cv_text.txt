@@ -1,0 +1,100 @@
+--- Page 1 ---
+Duy    Hoang     Anh             (cid:215) Phone: +84 344 778 045         
+                                         (cid:560) Ho Chi Minh City, VN           
+        Software Engineer                                                         
+                                         (cid:263) Email: hoanganhduy.yudhna@gmail.com
+             (cid:231) portfolio.yudhna.id.vn | (cid:93) linkedin.com/in/2004anhduy | (cid:97) github.com/yudhnaa
+                                                                                  
+      SUMMARY                                                                     
+                                                                                  
+        Computer Science graduate with hands-on experience building backend systems for authentication,
+        asynchronous processing, payment workflows, and transaction consistency. Seeking a Java Backend Developer
+        role to build reliable and maintainable backend services.                 
+                                                                                  
+      EDUCATION                                                                   
+                                                                                  
+        Ho Chi Minh Open University                      Ho Chi Minh City, Vietnam
+        B.S. in Computer Science                              Sep 2022 – Sep 2026 
+        GPA: 3.81 / 4.0                                                           
+                                                                                  
+      HONORS   & AWARDS                                                           
+                                                                                  
+        Top of Graduating Class – Computer Science                     2026       
+        First Prize – Student Scientific Research Competition, Medibot 2026       
+                                                                                  
+        First Prize – Open-Source Software Solutions Competition, University Level, Macro Mate 2025
+        Outstanding Student of the Year Award                   2024, 2025, 2026  
+        Academic Excellence Scholarship – 9 consecutive semesters   2022–2026     
+                                                                                  
+      CERTIFICATIONS                                                              
+                                                                                  
+        TOEIC Listening & Reading - 870/990 (L: 470, R: 400)           2025       
+        Samsung Innovation Campus – Big Data Certificate               2024       
+                                                                                  
+      SKILLS                                                                      
+        Languages:   Java, SQL, JavaScript                                        
+        Backend:     Spring Boot, Spring Security, Spring Data JPA, RESTful APIs, RabbitMQ
+                                                                                  
+        Databases:   PostgreSQL, MySQL                                            
+        Frontend:    React, Next.js, HTML/CSS, Tailwind CSS                       
+        DevOps & Tools: Git, Docker, GitHub Actions, Linux, Bash                  
+        AI Tools:    LangChain, LangGraph, Codex, Claude Code                     
+        Soft Skills: Problem-Solving, Communication, Teamwork, Adaptability       
+                                                                                  
+      PERSONAL   PROJECTS                                                         
+                                                                                  
+        Personal Tracker — Microservices Backend github.com/yudhnaa/personal-tracker-backend
+         • Built a personal productivity backend using Java 21, Spring Boot, PostgreSQL, and
+                                                                                  
+           RabbitMQ, with separate services for authentication, task tracking, and notifications.
+         • Implemented the Transactional Outbox pattern to store account events together with
+           user data in one database transaction and publish them asynchronously through RabbitMQ.
+                                                                                  
+         • Implemented an RS256 JWT authentication architecture where the Auth Service signs
+           tokens with a private key and the API Gateway validates them using public keys exposed
+                                                                                  
+           through a JWKS endpoint.                                               
+         • Built a dynamic wallpaper rendering engine using Java 2D to generate PNG images
+                                                                                  
+           from pending tasks and calendar events, with an in-memory cache to reuse rendered results.
+
+--- Page 2 ---
+E-Course — Learning Management System    github.com/yudhnaa/OU_E-Course_BE
+                                                 github.com/yudhnaa/OU_E-Course_FE
+                                                                                  
+         • Developed an online learning platform using Spring Boot and MySQL, supporting course
+           management, student enrollment, tests, and role-based access control.  
+                                                                                  
+         • Integrated Stripe Checkout and verified payment webhooks to process course purchases
+           and grant students access to paid courses.                             
+                                                                                  
+         • Automated PDF certificate generation using Thymeleaf and Flying Saucer when
+           students complete the course requirements, with checks to prevent duplicate certificates.
+                                                                                  
+                                                                                  
+      EXPERIENCE                                                                  
+                                                                                  
+        Python Developer Intern                               Sep 2025 – Jan 2026 
+        Golden Owl Solutions – Ho Chi Minh City, Vietnam                          
+                                                                                  
+         • News Aggregation Platform – System maintenance and feature development 
+             – Maintained a news aggregation platform that collects articles from websites and RSS
+                                                                                  
+              feeds, generates summaries for individual articles, and creates personalized daily news
+              digests for users.                                                  
+                                                                                  
+             – Reworked the crawler to handle changing CSS selectors by generating selectors from
+              page DOMs with an LLM, with admin review and manual fallback.       
+             – Improved a slow and inconsistent summarization flow by refining prompts, using a
+                                                                                  
+              lighter model, and applying polling to reduce timeout risk and token usage.
+                                                                                  
+         • Banking Interest Comparison Platform – Internal training project       
+             – Independently developed a web application using Django to track deposit rates across
+                                                                                  
+              approximately 12 Vietnamese banks and recommend suitable deposit terms.
+             – Built scheduled Celery jobs to collect and normalize interest-rate data from different
+                                                                                  
+              sources, with retries and fallback sources when crawlers failed.    
+             – Designed a PostgreSQL data model for banks, deposit products, term-based rates, and
+              historical data covering roughly one year.
