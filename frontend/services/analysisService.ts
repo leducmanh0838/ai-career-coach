@@ -53,7 +53,7 @@ export async function getAnalysisDetail(
     );
   }
 
-  const data = await res.json();
+  const data = (await res.json()) as AnalysisDetailData;
   return data;
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const verifyAuth = async () => {
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
                 const response = await fetch(`${apiUrl}/api/auth/refresh/`, {
                     method: 'POST',

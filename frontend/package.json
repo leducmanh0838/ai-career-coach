@@ -33,6 +33,7 @@
 		"start": "vite preview",
 		"deploy": "vinext-cloudflare deploy",
 		"preview": "npm run build && npm run start --",
+		"type-check": "tsc --noEmit",
 		"cf-typegen": "cf workers types"
 	}
 }

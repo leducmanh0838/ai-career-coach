@@ -120,7 +120,7 @@ export function Header({
   // Ghép họ và tên từ dữ liệu AuthContext
   const fullName = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "Tên";
 
-  // Reusable User Info Box (Sử dụng SafeImage trực tiếp với fallback mặc định)
+  // Reusable User Info Box
   const renderUserCard = () => (
     <div className="flex items-center gap-3 p-2.5 rounded-md bg-surface-2 mb-3">
       <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-border shadow-2xs shrink-0 bg-surface">
