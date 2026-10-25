@@ -6,6 +6,8 @@ from django.contrib.postgres.search import SearchVector
 from django.db import models
 from pgvector.django import HnswIndex, VectorField
 
+from app.services.embedding_service import get_embedding_vector
+
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -86,6 +88,13 @@ class StudentProfile(models.Model):
         return f"Hồ sơ: {self.user.username}"
 
 
+class SkillLevel(models.TextChoices):
+    FOUNDATION = "Foundation", "Nền tảng"
+    APPLIED = "Applied", "Ứng dụng"
+    PROFICIENT = "Proficient", "Thành thạo"
+    ADVANCED = "Advanced", "Nâng cao / Chuyên gia"
+
+
 class Skill(models.Model):
     """Bảng lưu trữ danh sách kỹ năng, kiến thức chuẩn."""
 
@@ -107,13 +116,6 @@ class Skill(models.Model):
         blank=True,
         null=True,
         verbose_name="Loại kỹ năng",
-    )
-
-    reuse_level = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name="Mức độ tái sử dụng",
     )
 
     synonyms = models.TextField(
@@ -151,7 +153,7 @@ class Skill(models.Model):
     is_verified = models.BooleanField(
         default=False,
         db_index=True,
-        verbose_name="Đã được xác thực bởi con người",
+        verbose_name="Đã được xác thực",
     )
 
     embedding = VectorField(
@@ -161,8 +163,25 @@ class Skill(models.Model):
         verbose_name="Vector Embedding",
     )
 
+    def save(self, *args, **kwargs):
+        # Tự động sinh vector nếu chưa có
+        if not self.embedding:
+            combined_text = f"{self.name}"
+
+            try:
+                self.embedding = get_embedding_vector(combined_text)
+            except Exception as e:
+                print(f"Lỗi khi sinh embedding: {e}")
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.name_vi or self.name
+        name_en = self.name.strip() if self.name else ""
+        name_vi = self.name_vi.strip() if self.name_vi else ""
+
+        if name_vi and name_vi.lower() != name_en.lower():
+            return f"{name_en} ({name_vi})"
+        return name_en
 
     class Meta:
         indexes = [
@@ -185,19 +204,12 @@ class Skill(models.Model):
             ),
         ]
 
+        verbose_name = "Kỹ năng"
+        verbose_name_plural = "Quản lý kỹ năng"
+
 
 class StudentSkill(models.Model):
-    """Bảng trung gian lưu trữ kỹ năng của sinh viên, hỗ trợ ghi đè khi có kết quả phân tích mới."""
-
-    class SkillLevel(models.TextChoices):
-        FOUNDATION = "Foundation", "Nền tảng"
-        APPLIED = "Applied", "Ứng dụng"
-        PROFICIENT = "Proficient", "Thành thạo"
-        ADVANCED = "Advanced", "Nâng cao / Chuyên gia"
-
-    class SkillStatus(models.TextChoices):
-        MATCHED = "matched", "Đã khớp"
-        UNMATCHED = "unmatched", "Chưa khớp hệ thống"
+    """Lưu trữ kỹ năng của sinh viên được phân tích từ CV."""
 
     student_profile = models.ForeignKey(
         StudentProfile,
@@ -206,7 +218,6 @@ class StudentSkill(models.Model):
         verbose_name="Hồ sơ sinh viên",
     )
 
-    # Liên kết tới bảng Skill (có thể null nếu skill ở trạng thái unmatched chưa có trong hệ thống ESCO)
     skill = models.ForeignKey(
         Skill,
         on_delete=models.SET_NULL,
@@ -226,7 +237,7 @@ class StudentSkill(models.Model):
 
     reasoning = models.TextField(
         blank=True,
-        null=True,
+        default="",
         verbose_name="Lý do đánh giá của AI",
     )
 
@@ -236,23 +247,29 @@ class StudentSkill(models.Model):
         verbose_name="Các đoạn bằng chứng trong CV",
     )
 
-    status = models.CharField(
-        max_length=20,
-        choices=SkillStatus.choices,
-        default=SkillStatus.MATCHED,
-        verbose_name="Trạng thái ánh xạ",
-    )
-
     class Meta:
         db_table = "student_skills"
         verbose_name = "Kỹ năng sinh viên"
         verbose_name_plural = "Danh sách kỹ năng sinh viên"
         indexes = [
-            models.Index(fields=["student_profile", "status"], name="student_skill_status_idx"),
+            models.Index(
+                fields=["student_profile"],
+                name="student_skill_profile_idx",
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student_profile", "skill"],
+                name="uniq_student_profile_skill",
+            ),
         ]
 
     def __str__(self):
-        return f"{self.student_profile.user.username} - {self.skill.name if self.skill else 'N/A'} ({self.level or 'N/A'})"
+        skill_name = self.skill.name if self.skill else "Chưa xác định"
+        return (
+            f"{self.student_profile.user.username} - "
+            f"{skill_name} ({self.level or 'Chưa đánh giá'})"
+        )
 
 
 class Occupation(models.Model):
@@ -326,10 +343,29 @@ class Occupation(models.Model):
         verbose_name="Vector Embedding",
     )
 
+    def save(self, *args, **kwargs):
+        if not self.embedding:
+            combined_text = f"{self.name}"
+
+            try:
+                self.embedding = get_embedding_vector(combined_text)
+            except Exception as e:
+                print(f"Lỗi khi sinh embedding: {e}")
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.name_vi or self.name
+        name_en = self.name.strip() if self.name else ""
+        name_vi = self.name_vi.strip() if self.name_vi else ""
+
+        # Nếu có name_vi, không rỗng và khác name_en thì gộp chung trong ngoặc
+        if name_vi and name_vi.lower() != name_en.lower():
+            return f"{name_en} ({name_vi})"
+        return name_en
 
     class Meta:
+        verbose_name = "Nghề nghiệp"
+        verbose_name_plural = "Quản lý nghề nghiệp"
         indexes = [
             HnswIndex(
                 fields=["embedding"],
@@ -339,18 +375,24 @@ class Occupation(models.Model):
                 opclasses=["vector_cosine_ops"],
             ),
             GinIndex(
-                SearchVector(
-                    "name",
-                    "synonyms",
-                    config="simple",
-                ),
+                SearchVector("name", "synonyms", config="simple"),
                 name="occ_fulltext_idx",
+            ),
+            # Bổ sung Full-Text Search cho Tiếng Việt
+            GinIndex(
+                SearchVector("name_vi", "synonyms_vi", config="simple"),
+                name="occ_fulltext_vi_idx",
             ),
         ]
 
 
 class OccupationSkillRelation(models.Model):
     """Bảng trung gian ánh xạ nghề nghiệp với kỹ năng."""
+
+    class OccupationRelationType(models.TextChoices):
+        """Loại quan hệ giữa nghề nghiệp và kỹ năng chuẩn."""
+        ESSENTIAL = "essential", "Bắt buộc (Essential)"
+        OPTIONAL = "optional", "Tùy chọn (Optional)"
 
     occupation = models.ForeignKey(
         Occupation,
@@ -368,10 +410,14 @@ class OccupationSkillRelation(models.Model):
 
     relation_type = models.CharField(
         max_length=50,
-        verbose_name="Loại quan hệ (Bắt buộc/Tùy chọn)",
+        choices=OccupationRelationType.choices,
+        default=OccupationRelationType.ESSENTIAL,
+        verbose_name="Loại quan hệ",
     )
 
     class Meta:
+        verbose_name = "Quan hệ Nghề nghiệp - Kỹ năng"
+        verbose_name_plural = "Quản lý quan hệ Nghề nghiệp - Kỹ năng"
         constraints = [
             models.UniqueConstraint(
                 fields=["occupation", "skill", "relation_type"],
@@ -380,14 +426,19 @@ class OccupationSkillRelation(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"{self.occupation.name} -> "
-            f"{self.skill.name} ({self.relation_type})"
-        )
+        relation_label = self.get_relation_type_display()
+        occ_name = self.occupation.name
+        skill_name = self.skill.name
+        return f"{occ_name} ──[{relation_label}]──> {skill_name}"
 
 
 class SkillDependency(models.Model):
     """Bảng lưu quan hệ giữa các kỹ năng."""
+
+    class SkillRelationType(models.TextChoices):
+        """Hai loại quan hệ kỹ năng chính."""
+        ESSENTIAL = "essential", "Bắt buộc (Essential)"
+        OPTIONAL = "optional", "Tùy chọn (Optional)"
 
     source_skill = models.ForeignKey(
         Skill,
@@ -405,14 +456,20 @@ class SkillDependency(models.Model):
 
     relation_type = models.CharField(
         max_length=50,
+        choices=SkillRelationType.choices,
+        default=SkillRelationType.ESSENTIAL,
         verbose_name="Loại quan hệ kỹ năng",
     )
 
     def __str__(self):
-        return (
-            f"{self.source_skill.name} relates to "
-            f"{self.related_skill.name}"
-        )
+        relation_label = self.get_relation_type_display()
+        source_name = self.source_skill.name_vi or self.source_skill.name
+        target_name = self.related_skill.name_vi or self.related_skill.name
+        return f"{source_name} ──[{relation_label}]──> {target_name}"
+
+    class Meta:
+        verbose_name = "Quan hệ kỹ năng"
+        verbose_name_plural = "Quản lý quan hệ kỹ năng"
 
 
 class AITaskLog(models.Model):
@@ -462,3 +519,193 @@ class AITaskLog(models.Model):
 
     def __str__(self):
         return f"[{self.task_type.upper()}] - {self.status} ({self.created_at.strftime('%Y-%m-%d %H:%M')})"
+
+
+class JobPosting(models.Model):
+    """Tin tuyển dụng do nhà tuyển dụng đăng."""
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Bản nháp"
+        PUBLISHED = "published", "Đang tuyển"
+        CLOSED = "closed", "Đã đóng"
+
+    recruiter = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="job_postings",
+        limit_choices_to={"role": "recruiter"},
+        verbose_name="Nhà tuyển dụng",
+    )
+    title = models.CharField(max_length=255, verbose_name="Tiêu đề")
+    description = models.TextField(verbose_name="Mô tả công việc")
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.DRAFT,
+        db_index=True,
+        verbose_name="Trạng thái",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "job_postings"
+        ordering = ["-created_at"]
+        verbose_name = "Tin tuyển dụng"
+        verbose_name_plural = "Danh sách tin tuyển dụng"
+
+    def __str__(self):
+        return self.title
+
+
+class JobRequiredSkill(models.Model):
+    """Kỹ năng yêu cầu của tin tuyển dụng, được trích xuất từ JD."""
+
+    job = models.ForeignKey(
+        JobPosting,
+        on_delete=models.CASCADE,
+        related_name="required_skills",
+        verbose_name="Tin tuyển dụng",
+    )
+
+    # Có thể null nếu AI chưa ánh xạ được kỹ năng vào ESCO.
+    skill = models.ForeignKey(
+        Skill,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="job_mappings",
+        verbose_name="Kỹ năng chuẩn",
+    )
+
+    level = models.CharField(
+        max_length=50,
+        choices=SkillLevel.choices,
+        blank=True,
+        null=True,
+        verbose_name="Mức độ yêu cầu",
+    )
+
+    reasoning = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Lý do AI đánh giá",
+    )
+
+    evidence = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Các đoạn bằng chứng trong JD",
+    )
+
+    class Meta:
+        db_table = "job_required_skills"
+        verbose_name = "Kỹ năng yêu cầu"
+        verbose_name_plural = "Danh sách kỹ năng yêu cầu"
+        indexes = [
+            models.Index(
+                fields=["job", "skill"],
+                name="job_required_skill_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.job.title} - "
+            f"{self.skill.name if self.skill else 'N/A'} "
+            f"({self.level or 'N/A'})"
+        )
+
+
+class LearningResource(models.Model):
+    """Tài liệu & định hướng ôn tập phân chia theo Cấp độ Kỹ năng."""
+
+    id = models.CharField(
+        max_length=500,
+        primary_key=True,
+        default=generate_uuid,
+        verbose_name="Mã định danh",
+    )
+    skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        related_name="learning_resources",
+        verbose_name="Kỹ năng liên quan",
+    )
+    level = models.CharField(
+        max_length=20,
+        choices=SkillLevel.choices,
+        default=SkillLevel.FOUNDATION,
+        verbose_name="Cấp độ năng lực",
+        db_index=True,  # Đánh index riêng cho level nếu cần lọc độc lập
+    )
+    title = models.CharField(
+        max_length=255,
+        verbose_name="Tiêu đề tài liệu / Chủ đề học",
+    )
+    url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name="Đường dẫn tham khảo (URL)",
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Nội dung cần đạt ở level này",
+    )
+
+    class Meta:
+        verbose_name = "Tài liệu học tập"
+        verbose_name_plural = "Quản lý tài liệu học tập"
+        indexes = [
+            # Đánh chỉ mục kết hợp (Composite Index) cho cả skill và level
+            models.Index(fields=["skill", "level"], name="learning_res_skill_level_idx"),
+        ]
+
+    def __str__(self):
+        return f"[{self.skill.name} - {self.get_level_display()}] {self.title}"
+
+
+class InterviewQuestion(models.Model):
+    """Bộ câu hỏi phỏng vấn phân chia theo Cấp độ Kỹ năng."""
+
+    id = models.CharField(
+        max_length=500,
+        primary_key=True,
+        default=generate_uuid,
+        verbose_name="Mã định danh",
+    )
+    skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        related_name="interview_questions",
+        verbose_name="Kỹ năng liên quan",
+    )
+    level = models.CharField(
+        max_length=20,
+        choices=SkillLevel.choices,
+        default=SkillLevel.FOUNDATION,
+        verbose_name="Cấp độ câu hỏi",
+        db_index=True,
+    )
+    question_text = models.TextField(
+        verbose_name="Nội dung câu hỏi phỏng vấn",
+    )
+    sample_answer = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Gợi ý câu trả lời / Ý chính cần đạt",
+    )
+
+    class Meta:
+        verbose_name = "Câu hỏi phỏng vấn"
+        verbose_name_plural = "Quản lý câu hỏi phỏng vấn"
+        indexes = [
+            # Đánh chỉ mục kết hợp cho cả skill và level
+            models.Index(fields=["skill", "level"], name="interview_ques_skill_level_idx"),
+        ]
+
+    def __str__(self):
+        target = self.skill.name if self.skill else "General"
+        return f"[{target} - {self.get_level_display()}] {self.question_text[:50]}..."

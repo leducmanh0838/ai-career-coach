@@ -10,11 +10,9 @@ class SkillViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = Skill.objects.all().order_by('name')
 
-        # Lấy tham số ?q= từ URL (ví dụ: /api/skills/?q=python)
         query = self.request.query_params.get('q', None)
 
         if query:
-            # Gộp các trường lại và sử dụng GIN Index đã khai báo trong Meta.indexes
             search_vector = (
                     SearchVector('name', weight='A', config='simple') +
                     SearchVector('synonyms', weight='B', config='simple') +
