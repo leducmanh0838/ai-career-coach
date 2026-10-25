@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 
-from .models import CustomUser, AITaskLog
+from app.models import CustomUser, AITaskLog
 
 
 @admin.register(CustomUser)

@@ -20,7 +20,7 @@ class StudentSkillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentSkill
-        fields = ["id", "skill", "level", "reasoning", "evidence", "status"]
+        fields = ["id", "skill", "level", "reasoning", "evidence"]
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):

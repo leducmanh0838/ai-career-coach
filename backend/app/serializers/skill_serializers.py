@@ -30,6 +30,6 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = [
-            "id", "name", "name_vi", "skill_type", "reuse_level",
+            "id", "name", "name_vi", "skill_type",
             "synonyms", "description", "synonyms_vi", "description_vi", "is_verified"
         ]

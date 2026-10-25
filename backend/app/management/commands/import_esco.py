@@ -283,7 +283,6 @@ class Command(BaseCommand):
                     id=clean(row.get("conceptUri")),
                     name=clean(row.get("preferredLabel")),
                     skill_type=clean(row.get("skillType")),
-                    reuse_level=clean(row.get("reuseLevel")),
                     synonyms=combine_labels(
                         row.get("altLabels"),
                         row.get("hiddenLabels"),

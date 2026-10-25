@@ -35,6 +35,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,8 +137,54 @@ GOOGLE_TRANSLATE_API_KEY = os.getenv('GOOGLE_TRANSLATE_API_KEY')
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': True,
+}
+
+# settings.py
+
+JAZZMIN_SETTINGS = {
+    # 1. Thông tin chung
+    "site_title": "AI Career Coach Admin",
+    "site_header": "AI Career Coach",
+    "site_brand": "Aura Farming",
+    "welcome_sign": "Chào mừng bạn đến với hệ thống AI Career Coach",
+    "copyright": "AURA FARMING 20 PRO MAX",
+
+    "search_model": ["auth.User", "app.Skill", "app.Occupation"],
+
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user-shield",
+        "auth.Group": "fas fa-users",
+
+        "app.Skill": "fas fa-brain",
+        "app.SkillDependency": "fas fa-project-diagram",
+        "app.Occupation": "fas fa-briefcase",
+        "app.OccupationSkillRelation": "fas fa-network-wired",
+        "app.AITaskLog": "fas fa-robot",
+        "app.User": "fas fa-graduate",
+    },
+
+    "order_with_respect_to": [
+        "app.Occupation",
+        "app.OccupationSkillRelation",
+        "app.Skill",
+        "app.SkillDependency",
+        "app.AITaskLog",
+        "auth",
+    ],
+
+    "changeform_format": "single",
+    "changeform_format_overrides": {
+        "app.skill": "tabs",
+        "app.occupation": "single",
+        "auth.user": "single",
+    },
+
+    "show_ui_builder": False,
 }
