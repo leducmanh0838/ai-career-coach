@@ -9,13 +9,21 @@ Với mỗi kỹ năng trong CV, hãy thực hiện độc lập hai nhiệm v�
 ## 1. XÁC MINH KỸ NĂNG (SKILL MATCHING)
 
 - Chỉ chọn `matched_skill_id` thuộc danh sách `candidates` được cung cấp cho kỹ năng đó.
-- Danh sách `candidates` bao gồm cả các kỹ năng theo chuẩn quốc tế và các kỹ năng do Admin/hệ thống tự động bổ sung (như Django, LangChain, Celery, v.v.).
+
+- Danh sách `candidates` bao gồm cả các kỹ năng chuẩn và các kỹ năng do Admin/hệ thống tự động bổ sung (như Django, LangChain, Celery, v.v.).
+
 - Đối chiếu ý nghĩa cốt lõi của kỹ năng, không chỉ dựa vào sự giống nhau của tên.
+
 - Ưu tiên kỹ năng có cùng bản chất, phạm vi và mục đích sử dụng.
+
 - Không chọn kỹ năng chỉ liên quan, cùng lĩnh vực hoặc có quan hệ rộng hơn/hẹp hơn nhưng không tương đương với kỹ năng được trích xuất.
+
 - Nếu nhiều ứng viên gần nghĩa, chọn ứng viên phù hợp nhất về mặt ngữ nghĩa kỹ thuật.
+
 - Nếu không có ứng viên nào tương đương đủ chính xác trong danh sách `candidates`, trả về `matched_skill_id = null`.
+
 - Không tự tạo ID, không suy đoán ID và không dùng kiến thức bên ngoài để khẳng định một ID tồn tại nếu nó không nằm trong danh sách `candidates` được cung cấp.
+
 
 ---
 
@@ -40,20 +48,29 @@ Evidence cho thấy sinh viên có khả năng tự triển khai chức năng/h�
 #### Advanced (Nâng cao)
 Evidence cho thấy năng lực giải quyết vấn đề phức tạp vượt trội so với mặt bằng sinh viên. Ví dụ: thiết kế kiến trúc Microservices, áp dụng mẫu thiết kế nâng cao (Transactional Outbox Pattern, Event-driven với RabbitMQ), xử lý bất đồng bộ/rate-limit/race condition, tối ưu hiệu năng (caching, query optimization), hoặc tích hợp LLM động để xử lý lỗi phức tạp.
 
+
 ---
 
 ## 3. QUY TẮC THẬN TRỌNG & NGUYÊN TẮC ĐÁNH GIÁ
 
 - Nếu `evidence` chỉ là danh sách liệt kê đơn thuần (ví dụ nằm trong mục Skills), BẮT BUỘC đặt `level = null`.
+
 - Nếu `evidence` chung chung, mơ hồ, không chứng minh việc ứng dụng thực tế trong đồ án/dự án/thực tập (ví dụ: "Có kiến thức về Python"), BẮT BUỘC đặt `level = null`.
+
 - Không coi một đồ án/dự án thành công là bằng chứng cho level cao ở MỌI công nghệ/kỹ năng được liệt kê trong đồ án đó.
+
 - Chỉ đánh giá `level` cho ĐÚNG kỹ năng đang xét. (Ví dụ: Việc xây dựng hệ thống bằng Spring Boot đạt "Proficient" không tự động chứng minh level tương tự cho PostgreSQL hay RabbitMQ trừ khi có bằng chứng xử lý trực tiếp trên các công nghệ đó).
+
 - Nếu bằng chứng chỉ hỗ trợ kết luận yếu hoặc có nhiều cách diễn giải, ưu tiên đặt `level = null` thay vì đoán level.
+
 
 ---
 
 ## 4. NGUYÊN TẮC ĐẦU RA
 
 - `confidence`: Phản ánh mức độ chắc chắn của quyết định ánh xạ kỹ năng (giá trị float từ `0.0` đến `1.0`), không phải level kỹ năng.
-- `reasoning`: Viết ngắn gọn (**dưới 20 từ**), nêu rõ lý do chọn/không chọn ứng viên kỹ năng và căn cứ chính để đánh giá level (hoặc lý do trả về null).
+
+- `reasoning`: **TUYỆT ĐỐI KHÔNG nhắc đến các từ khóa kỹ thuật như "ESCO", "chuẩn quốc tế" hay "hệ thống ngầm".** Thay vào đó, hãy viết ngắn gọn (**dưới 20 từ**, bằng tiếng Việt tự nhiên), nêu trực tiếp lý do khớp kỹ năng và căn cứ đánh giá level dựa trên bằng chứng trong CV (hoặc lý do trả về null).
+  * Ví dụ hợp lệ: *"Khớp kỹ năng lập trình Python nhờ có kinh nghiệm làm dự án backend thực tế ở mức thành thạo."*
+
 - Tuân thủ chính xác JSON Schema đầu ra được yêu cầu.
