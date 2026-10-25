@@ -147,7 +147,7 @@ async function fetchRealHistory(
     );
   }
 
-  const data = await res.json();
+  const data = (await res.json()) as any;
 
   // Adapter: Xử lý linh hoạt format của Django REST Framework hoặc custom API
   const rawList: any[] = data.results ?? data.records ?? data.data ?? [];

@@ -1,30 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { z } from 'zod';
-
-// 1. Định nghĩa Zod Schema cho dữ liệu thô từ Backend (snake_case)
-const backendUserSchema = z.object({
-    id: z.number(),
-    email: z.string(),
-    first_name: z.string(),
-    last_name: z.string(),
-    role: z.string(),
-    avatar_url: z.string(),
-});
-
-// 2. Transform sang chuẩn camelCase cho Frontend sử dụng
-const userSchema = backendUserSchema.transform((data) => ({
-    id: data.id,
-    email: data.email,
-    firstName: data.first_name,
-    lastName: data.last_name,
-    role: data.role,
-    avatarUrl: data.avatar_url,
-}));
-
-// Kiểu dữ liệu TypeScript suy ra từ Zod Schema
-export type User = z.infer<typeof userSchema>;
+import { User, userSchema } from "@/types/auth";
+export type { User };
 
 interface AuthContextType {
     user: User | null;
@@ -42,7 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const verifyAuth = async () => {
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
                 const response = await fetch(`${apiUrl}/api/auth/refresh/`, {
                     method: 'POST',

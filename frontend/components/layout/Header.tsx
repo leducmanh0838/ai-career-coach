@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export interface NavItem {
   label: string;
@@ -234,11 +235,31 @@ export function UserAvatarIllustration({ className = "w-full h-full" }: { classN
  */
 export function Header({
   navItems = DEFAULT_NAV_ITEMS,
-  user = { name: "Tên", role: "Học viên" },
+  user: propUser,
   className = "",
   onLogout,
 }: HeaderProps) {
   const pathname = usePathname() || "/";
+  let authContext: ReturnType<typeof useAuth> | null = null;
+  try {
+    authContext = useAuth();
+  } catch {
+    // Graceful fallback if Header is used outside AuthProvider
+  }
+
+  const user: UserProfile | null =
+    propUser !== undefined
+      ? propUser
+      : authContext?.user
+      ? {
+          name: authContext.user.name,
+          avatarUrl: authContext.user.avatarUrl,
+          email: authContext.user.email,
+          role: authContext.user.role,
+        }
+      : null;
+
+  const handleLogout = onLogout || authContext?.logout;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -351,121 +372,130 @@ export function Header({
 
         {/* RIGHT: User Profile & Mobile Toggle */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-          {/* User Profile Container */}
-          <div className="relative" ref={profileRef}>
-            <button
-              type="button"
-              id="user-profile-menu-button"
-              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              aria-expanded={isProfileMenuOpen}
-              aria-haspopup="true"
-              className="flex items-center gap-1.5 sm:gap-2 pl-1 pr-1.5 sm:pr-2.5 py-0.5 sm:py-1 rounded-full hover:bg-surface/60 active:bg-surface transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-            >
-              {/* Circular Avatar */}
-              <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden ring-1 ring-border shadow-2xs shrink-0 bg-surface">
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name || "Avatar"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <UserAvatarIllustration />
-                )}
-              </div>
-
-              {/* User Name */}
-              <span className="text-sm sm:text-base font-medium text-text max-w-[70px] sm:max-w-[110px] truncate hidden xs:inline-block">
-                {user.name || "Tên"}
-              </span>
-
-              {/* Subtle chevron */}
-              <svg
-                className={`w-3.5 h-3.5 text-muted transition-transform duration-200 hidden sm:block ${
-                  isProfileMenuOpen ? "rotate-180" : ""
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
+          {user ? (
+            /* User Profile Container */
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                id="user-profile-menu-button"
+                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                aria-expanded={isProfileMenuOpen}
+                aria-haspopup="true"
+                className="flex items-center gap-1.5 sm:gap-2 pl-1 pr-1.5 sm:pr-2.5 py-0.5 sm:py-1 rounded-full hover:bg-surface/60 active:bg-surface transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {/* Desktop User Dropdown Menu */}
-            {isProfileMenuOpen && (
-              <div
-                className="absolute right-0 mt-2 w-56 rounded-md bg-surface p-1.5 shadow-lg border border-border z-50"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="user-profile-menu-button"
-              >
-                <div className="px-3 py-2 border-b border-border mb-1">
-                  <p className="text-sm font-semibold text-text truncate">
-                    {user.name || "Tên người dùng"}
-                  </p>
-                  <p className="text-xs text-muted truncate">
-                    {user.email || user.role || "Học viên"}
-                  </p>
+                {/* Circular Avatar */}
+                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden ring-1 ring-border shadow-2xs shrink-0 bg-surface">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name || "Avatar"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <UserAvatarIllustration />
+                  )}
                 </div>
 
-                <Link
-                  href="/profile"
-                  role="menuitem"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
-                >
-                  <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  Hồ sơ cá nhân
-                </Link>
+                {/* User Name */}
+                <span className="text-sm sm:text-base font-medium text-text max-w-[70px] sm:max-w-[110px] truncate hidden xs:inline-block">
+                  {user.name || "Tên"}
+                </span>
 
-                <Link
-                  href="/history"
-                  role="menuitem"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
+                {/* Subtle chevron */}
+                <svg
+                  className={`w-3.5 h-3.5 text-muted transition-transform duration-200 hidden sm:block ${
+                    isProfileMenuOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden="true"
                 >
-                  <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Lịch sử phân tích
-                </Link>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-                <Link
-                  href="/docs"
-                  role="menuitem"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
+              {/* Desktop User Dropdown Menu */}
+              {isProfileMenuOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-56 rounded-md bg-surface p-1.5 shadow-lg border border-border z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-profile-menu-button"
                 >
-                  <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Tài liệu kỹ thuật
-                </Link>
+                  <div className="px-3 py-2 border-b border-border mb-1">
+                    <p className="text-sm font-semibold text-text truncate">
+                      {user.name || "Tên người dùng"}
+                    </p>
+                    <p className="text-xs text-muted truncate">
+                      {user.email || user.role || "Học viên"}
+                    </p>
+                  </div>
 
-                <div className="border-t border-border my-1" />
+                  <Link
+                    href="/profile"
+                    role="menuitem"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Hồ sơ cá nhân
+                  </Link>
 
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    onLogout?.();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-sm transition-colors cursor-pointer"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Đăng xuất
-                </button>
-              </div>
-            )}
-          </div>
+                  <Link
+                    href="/history"
+                    role="menuitem"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Lịch sử phân tích
+                  </Link>
+
+                  <Link
+                    href="/docs"
+                    role="menuitem"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-text hover:text-primary hover:bg-surface-2 rounded-sm transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Tài liệu kỹ thuật
+                  </Link>
+
+                  <div className="border-t border-border my-1" />
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsProfileMenuOpen(false);
+                      handleLogout?.();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-sm transition-colors cursor-pointer"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs sm:text-sm font-semibold shadow-xs hover:opacity-95 transition-all active:scale-95"
+            >
+              Đăng nhập
+            </Link>
+          )}
 
           {/* MOBILE HAMBURGER BUTTON (Hidden on Desktop >= 768px) */}
           <button
@@ -514,27 +544,37 @@ export function Header({
             className="relative z-50 mx-auto mt-2 max-w-sm w-full rounded-lg bg-surface p-4 shadow-xl border border-border md:hidden"
           >
             {/* User Profile Banner in Mobile Menu */}
-            <div className="flex items-center gap-3 p-2.5 rounded-md bg-surface-2 mb-3">
-              <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-border shadow-2xs shrink-0 bg-surface">
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name || "Avatar"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <UserAvatarIllustration />
-                )}
+            {user ? (
+              <div className="flex items-center gap-3 p-2.5 rounded-md bg-surface-2 mb-3">
+                <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-border shadow-2xs shrink-0 bg-surface">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name || "Avatar"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <UserAvatarIllustration />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-text truncate">
+                    {user.name || "Tên người dùng"}
+                  </p>
+                  <p className="text-xs text-muted truncate">
+                    {user.email || user.role || "Học viên"}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-text truncate">
-                  {user.name || "Tên người dùng"}
-                </p>
-                <p className="text-xs text-muted truncate">
-                  {user.email || user.role || "Học viên"}
-                </p>
-              </div>
-            </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-md bg-primary text-on-primary text-sm font-semibold shadow-xs mb-3"
+              >
+                Đăng nhập tài khoản
+              </Link>
+            )}
 
             {/* Navigation Links */}
             <nav className="flex flex-col gap-1" aria-label="Menu di động">
@@ -573,16 +613,18 @@ export function Header({
 
             {/* Quick Actions */}
             <div className="flex flex-col gap-1">
-              <Link
-                href="/profile"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs text-text hover:bg-surface-2 transition-colors"
-              >
-                <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>Hồ sơ cá nhân</span>
-              </Link>
+              {user && (
+                <Link
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs text-text hover:bg-surface-2 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Hồ sơ cá nhân</span>
+                </Link>
+              )}
 
               <Link
                 href="/docs"
@@ -595,19 +637,21 @@ export function Header({
                 <span>Tài liệu nội bộ (/docs)</span>
               </Link>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  onLogout?.();
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Đăng xuất</span>
-              </button>
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout?.();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                >
+                  <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Đăng xuất</span>
+                </button>
+              )}
             </div>
           </div>
         </>

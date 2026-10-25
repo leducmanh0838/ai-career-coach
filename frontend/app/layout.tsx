@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
-  console.info("googleClientId: ", googleClientId)
   return (
     <html lang="vi">
       <body className="min-h-screen bg-bg text-text antialiased">
@@ -25,4 +24,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-
