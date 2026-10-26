@@ -144,21 +144,21 @@ function SkillModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800">
+            <div className="bg-surface rounded-lg shadow-xl max-w-md w-full p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-semibold text-text">
                         {editingSkill?.id ? "Chỉnh sửa mức độ kỹ năng" : "Thêm kỹ năng mới"}
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm font-bold"
+                        className="text-muted hover:text-text text-sm font-bold"
                     >
                         ✕
                     </button>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-xs rounded">
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-sm">
                         {error}
                     </div>
                 )}
@@ -166,12 +166,12 @@ function SkillModal({
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {!editingSkill?.id ? (
                         <div className="relative">
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-xs font-medium text-muted mb-1">
                                 Tìm kiếm kỹ năng trong hệ thống
                             </label>
                             {selectedSkill ? (
-                                <div className="flex items-center justify-between p-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-                                    <span className="text-sm font-medium text-blue-900 dark:text-blue-300">
+                                <div className="flex items-center justify-between p-2.5 bg-primary-soft border border-border rounded-sm">
+                                    <span className="text-sm font-medium text-primary">
                                         {selectedSkill.name_vi
                                             ? `${selectedSkill.name_vi} (${selectedSkill.name})`
                                             : selectedSkill.name || selectedSkill.skill_name}
@@ -179,7 +179,7 @@ function SkillModal({
                                     <button
                                         type="button"
                                         onClick={() => setSelectedSkill(null)}
-                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                                        className="text-xs text-primary hover:underline"
                                     >
                                         Đổi kỹ năng
                                     </button>
@@ -191,14 +191,14 @@ function SkillModal({
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Nhập tên kỹ năng (ví dụ: Python, React...)"
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
                                     />
                                     {searching && (
-                                        <p className="text-xs text-gray-400 mt-1">Đang tìm kiếm...</p>
+                                        <p className="text-xs text-muted mt-1">Đang tìm kiếm...</p>
                                     )}
 
                                     {searchResults.length > 0 && (
-                                        <ul className="absolute z-50 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md shadow-lg">
+                                        <ul className="absolute z-50 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-surface border border-border rounded-sm shadow-lg">
                                             {searchResults.map((skill) => (
                                                 <li
                                                     key={skill.id}
@@ -207,13 +207,13 @@ function SkillModal({
                                                         setSearchResults([]);
                                                         setSearchQuery("");
                                                     }}
-                                                    className="px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-zinc-700/50 last:border-none"
+                                                    className="px-3 py-2 text-sm hover:bg-surface-2 cursor-pointer text-text border-b border-border last:border-none"
                                                 >
                                                     <div className="font-medium">
                                                         {skill.name_vi || skill.name}
                                                     </div>
                                                     {skill.name_vi && (
-                                                        <div className="text-xs text-gray-400">
+                                                        <div className="text-xs text-muted">
                                                             {skill.name}
                                                         </div>
                                                     )}
@@ -226,10 +226,10 @@ function SkillModal({
                         </div>
                     ) : (
                         <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-xs font-medium text-muted mb-1">
                                 Kỹ năng
                             </label>
-                            <div className="p-2.5 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md text-sm font-medium text-gray-800 dark:text-gray-200">
+                            <div className="p-2.5 bg-surface-2 border border-border rounded-sm text-sm font-medium text-text">
                                 {selectedSkill?.name_vi
                                     ? `${selectedSkill.name_vi} (${selectedSkill.name})`
                                     : selectedSkill?.name || editingSkill?.skill_name || "Kỹ năng"}
@@ -238,13 +238,13 @@ function SkillModal({
                     )}
 
                     <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-xs font-medium text-muted mb-1">
                             Mức độ thành thạo (Level)
                         </label>
                         <select
                             value={level}
                             onChange={(e) => setLevel(e.target.value)}
-                            className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             {AVAILABLE_LEVELS.map((lvl) => (
                                 <option key={lvl.value} value={lvl.value}>
@@ -258,14 +258,14 @@ function SkillModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-md transition"
+                            className="px-4 py-2 text-xs font-medium text-muted bg-surface-2 hover:opacity-80 rounded-sm transition border border-border"
                         >
                             Hủy
                         </button>
                         <button
                             type="submit"
                             disabled={loading || (!editingSkill?.id && !selectedSkill)}
-                            className="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-md transition"
+                            className="px-4 py-2 text-xs font-medium text-on-primary bg-primary hover:opacity-90 disabled:opacity-50 rounded-sm transition shadow-sm"
                         >
                             {loading ? "Đang lưu..." : "Lưu thay đổi"}
                         </button>
