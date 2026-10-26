@@ -57,30 +57,30 @@ export default function ProfileSkillsCard({ skills, onProfileUpdate }: ProfileSk
   };
 
   return (
-    <div className="border border-gray-200 dark:border-zinc-800 rounded-lg p-5 bg-white dark:bg-zinc-800/30">
+    <div className="border border-border rounded-lg p-5 bg-surface shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white">Kỹ năng (Skills)</h2>
+          <h2 className="text-base font-semibold text-text">Kỹ năng (Skills)</h2>
           {skills && skills.length > 0 && (
-            <span className="text-xs bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300 font-medium px-2.5 py-0.5 rounded-full">
+            <span className="text-xs bg-surface-2 text-muted font-medium px-2.5 py-0.5 rounded-full">
               {skills.length}
             </span>
           )}
         </div>
         <button
           onClick={handleOpenAdd}
-          className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+          className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
         >
           + Thêm kỹ năng
         </button>
       </div>
 
       {!skills || skills.length === 0 ? (
-        <div className="text-center py-6 px-4 border border-dashed border-amber-300 dark:border-amber-800 bg-amber-50/50 dark:bg-zinc-800/30 rounded-md">
-          <p className="text-sm text-amber-800 dark:text-amber-400 font-medium">Bạn chưa có kỹ năng nào được ghi nhận trong hồ sơ!</p>
+        <div className="text-center py-6 px-4 border border-dashed border-border bg-surface-2 rounded-md">
+          <p className="text-sm text-muted font-medium">Bạn chưa có kỹ năng nào được ghi nhận trong hồ sơ!</p>
           <button
             onClick={handleOpenAdd}
-            className="mt-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition"
+            className="mt-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-on-primary bg-primary hover:opacity-90 rounded-md transition"
           >
             + Thêm kỹ năng ngay
           </button>
@@ -99,9 +99,9 @@ export default function ProfileSkillsCard({ skills, onProfileUpdate }: ProfileSk
               <div
                 key={item.id}
                 onClick={() => handleOpenEdit(item)} // Click vào thẻ để mở modal chỉnh sửa level
-                className="p-3 rounded-md border border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/30 flex items-center justify-between gap-3 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition group relative"
+                className="p-3 rounded-md border border-border bg-surface-2 flex items-center justify-between gap-3 cursor-pointer hover:border-primary transition group relative"
               >
-                <span className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                <span className="font-medium text-sm text-text truncate group-hover:text-primary">
                   {skillDisplayName}
                 </span>
 
@@ -116,7 +116,7 @@ export default function ProfileSkillsCard({ skills, onProfileUpdate }: ProfileSk
                     onClick={(e) => handleDeleteSkill(item.id, e)}
                     disabled={isDeleting}
                     title="Xóa kỹ năng"
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1 rounded transition disabled:opacity-50"
+                    className="opacity-0 group-hover:opacity-100 text-muted hover:text-red-600 p-1 rounded-sm transition disabled:opacity-50"
                   >
                     {isDeleting ? "..." : "✕"}
                   </button>
