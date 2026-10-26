@@ -61,9 +61,9 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 text-gray-500">
+      <div className="min-h-screen flex items-center justify-center bg-bg text-muted">
         <div className="flex items-center space-x-3">
-          <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           <span>Đang tải thông tin hồ sơ...</span>
         </div>
       </div>
@@ -72,18 +72,18 @@ export default function ProfilePage() {
 
   if (error) {
     return (
-      <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg text-center text-red-600">
-        <p className="font-medium">{error}</p>
+      <div className="max-w-xl mx-auto mt-12 p-6 bg-surface border border-border rounded-lg text-center shadow-sm">
+        <p className="font-medium text-red-600">{error}</p>
         <div className="mt-4 flex justify-center gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 transition"
+            className="px-4 py-2 bg-surface-2 text-muted text-sm font-medium rounded-sm hover:opacity-80 transition"
           >
             Thử lại
           </button>
           <button
             onClick={() => router.push("/login")}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-primary text-on-primary text-sm font-medium rounded-sm hover:opacity-90 transition"
           >
             Đăng nhập lại
           </button>
@@ -95,7 +95,7 @@ export default function ProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 relative">
+    <div className="min-h-screen bg-bg text-text relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
 

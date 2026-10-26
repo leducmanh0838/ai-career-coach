@@ -84,15 +84,15 @@ export default function ProfileSummaryCard({
 
   if (!studentProfile) {
     return (
-      <div className="p-8 border border-dashed border-blue-300 dark:border-blue-800 rounded-lg bg-blue-50/50 dark:bg-zinc-800/50 text-center">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Chào bạn! Hãy cập nhật CV của mình nhé 🚀</h3>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+      <div className="p-8 border border-dashed border-primary bg-primary-soft rounded-lg text-center shadow-sm">
+        <h3 className="text-lg font-semibold text-text">Chào bạn! Hãy cập nhật CV của mình nhé 🚀</h3>
+        <p className="mt-1 text-sm text-muted max-w-md mx-auto">
           Tải lên CV giúp hệ thống tự động phân tích kinh nghiệm và đề xuất cơ hội nghề nghiệp phù hợp nhất dành cho bạn.
         </p>
         <div className="mt-5">
           <button
             onClick={onOpenUploadModal}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-md shadow-sm transition"
           >
             Tải CV lên ngay để AI phân tích
           </button>
@@ -104,15 +104,15 @@ export default function ProfileSummaryCard({
   return (
     <div className="space-y-6">
       {/* KHU VỰC TÓM TẮT & ĐỊNH HƯỚNG */}
-      <div className="border border-gray-200 dark:border-zinc-800 rounded-lg p-5 bg-white dark:bg-zinc-800/30 relative">
+      <div className="border border-border rounded-lg p-5 bg-surface shadow-sm relative">
 
         {/* Header card kèm nút chỉnh sửa */}
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold">Tóm tắt bản thân & Định hướng</h2>
+          <h2 className="text-base font-semibold text-text">Tóm tắt bản thân & Định hướng</h2>
           {!isEditing ? (
             <button
               onClick={handleStartEdit}
-              className="inline-flex items-center space-x-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-md border border-blue-200 dark:border-blue-800 transition"
+              className="inline-flex items-center space-x-1 text-xs font-medium text-primary hover:opacity-80 bg-primary-soft px-2.5 py-1 rounded-sm border border-border transition"
             >
               <Pencil className="w-3.5 h-3.5" />
               <span>Chỉnh sửa</span>
@@ -122,7 +122,7 @@ export default function ProfileSummaryCard({
               <button
                 onClick={handleCancel}
                 disabled={loading}
-                className="inline-flex items-center space-x-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700 px-2.5 py-1 rounded-md border border-gray-300 dark:border-zinc-700 transition"
+                className="inline-flex items-center space-x-1 text-xs font-medium text-muted hover:bg-surface-2 px-2.5 py-1 rounded-sm border border-border transition"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>Hủy</span>
@@ -130,7 +130,7 @@ export default function ProfileSummaryCard({
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="inline-flex items-center space-x-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md shadow-sm transition disabled:opacity-50"
+                className="inline-flex items-center space-x-1 text-xs font-medium text-on-primary bg-primary hover:opacity-90 px-3 py-1 rounded-sm shadow-sm transition disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                 <span>Lưu</span>
@@ -140,14 +140,14 @@ export default function ProfileSummaryCard({
         </div>
 
         {error && (
-          <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
+          <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-sm text-xs text-red-600">
             {error}
           </div>
         )}
 
         {/* Nội dung Tóm tắt */}
         <div className="mb-4">
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             Profile Summary
           </label>
           {isEditing ? (
@@ -155,10 +155,10 @@ export default function ProfileSummaryCard({
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               rows={4}
-              className="w-full text-sm p-3 rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-sm p-3 rounded-sm border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-zinc-900/50 p-4 rounded-md border border-gray-100 dark:border-zinc-800">
+            <p className="text-sm text-muted leading-relaxed bg-surface-2 p-4 rounded-sm border border-border">
               {studentProfile.profile_summary || "Chưa có tóm tắt hồ sơ."}
             </p>
           )}
@@ -166,7 +166,7 @@ export default function ProfileSummaryCard({
 
         {/* Nội dung Vị trí định hướng */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-muted mb-1">
             Định hướng vị trí phù hợp (cách nhau bằng dấu phẩy)
           </label>
           {isEditing ? (
@@ -175,7 +175,7 @@ export default function ProfileSummaryCard({
               value={occupationsStr}
               onChange={(e) => setOccupationsStr(e.target.value)}
               placeholder="Software Engineer, Backend Developer,..."
-              className="w-full text-sm p-2.5 rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-sm p-2.5 rounded-sm border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
             <div className="flex flex-wrap gap-2 pt-1">
@@ -183,13 +183,13 @@ export default function ProfileSummaryCard({
                 studentProfile.extracted_occupations.map((occupation, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full border border-blue-200 dark:border-blue-800"
+                    className="px-3 py-1 bg-primary-soft text-primary text-xs font-medium rounded-full border border-border"
                   >
                     {occupation}
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-gray-400 italic">Chưa có vị trí định hướng nào.</span>
+                <span className="text-xs text-muted italic">Chưa có vị trí định hướng nào.</span>
               )}
             </div>
           )}
