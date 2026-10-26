@@ -1,4 +1,3 @@
-# app/services/analyze_skill_service/orchestrator.py
 import json
 import time
 import os
@@ -6,7 +5,7 @@ import tempfile
 from typing import Literal, Optional, Generator, Any
 from django.core.files.uploadedfile import UploadedFile
 
-from app.models import AITaskLog
+from app.models import AITaskLog, JobPosting
 from app.services.analyze_skill_service.ai_config import CRITICAL_MODEL, LIGHT_MODEL, DEFAULT_SKILL_TOP_K, get_llm, \
     get_embeddings
 from app.services.analyze_skill_service.utils import extract_document_text, save_debug_artifact
@@ -17,6 +16,7 @@ from app.services.analyze_skill_service.pipeline import (
     auto_expand_unmatched_skills,
     build_final_result,
 )
+from app.services.job_posting import save_jd_analysis_result
 from app.services.student_skill import save_student_analysis_result
 
 
@@ -27,6 +27,7 @@ def analyze_document_stream(
         skill_top_k: int = DEFAULT_SKILL_TOP_K,
         debug_dir: Optional[str] = "results/debug",
         user=None,
+        job_posting: Optional[JobPosting] = None,  # Thêm tham số job_posting
 ) -> Generator[dict[str, Any], None, None]:
     """Hàm chạy pipeline dưới dạng Generator, yield từng trạng thái bước để làm SSE."""
     task_type = "cv_analysis" if doc_type == "cv" else "jd_analysis"
@@ -36,7 +37,8 @@ def analyze_document_stream(
         "file_name": pdf_file.name if pdf_file else None,
         "has_text": bool(text_content),
         "doc_type": doc_type,
-        "skill_top_k": skill_top_k
+        "skill_top_k": skill_top_k,
+        "job_posting_id": job_posting.id if job_posting else None
     }
 
     # 1. Khởi tạo log PENDING trong DB
@@ -60,7 +62,6 @@ def analyze_document_stream(
         step_artifacts_dict[step_name] = data
         task_log.step_artifacts = step_artifacts_dict
         task_log.save(update_fields=["step_artifacts", "updated_at"])
-        # Yield thông tin trạng thái để stream ra client
         return {"step": step_name, "status": "PROCESSING", "message": message}
 
     try:
@@ -149,15 +150,22 @@ def analyze_document_stream(
         yield update_progress("step_5_2_skill_decisions_expanded", json.loads(skill_decisions.model_dump_json()),
                               "Đã hoàn tất đánh giá và tổng hợp kỹ năng.")
 
-        # Tổng hợp kết quả cuối cùng (dict chuẩn xác)
+        # Tổng hợp kết quả cuối cùng
         final_result = build_final_result(facts, skill_decisions, doc_type=doc_type)
         save_debug_artifact(debug_dir, f"step_5_3_final_result_{doc_type}.json", final_result)
 
-        if user and user.is_authenticated and doc_type == "cv":
-            try:
-                save_student_analysis_result(user, final_result)
-            except Exception as db_err:
-                print(f"⚠️ Cảnh báo: Không thể lưu profile sinh viên vào DB: {db_err}")
+        # Lưu tự động vào DB theo loại tài liệu
+        if user and user.is_authenticated:
+            if doc_type == "cv":
+                try:
+                    save_student_analysis_result(user, final_result)
+                except Exception as db_err:
+                    print(f"⚠️ Cảnh báo: Không thể lưu profile sinh viên vào DB: {db_err}")
+            elif doc_type == "jd" and job_posting:
+                try:
+                    save_jd_analysis_result(job_posting, final_result)
+                except Exception as db_err:
+                    print(f"⚠️ Cảnh báo: Không thể lưu kỹ năng yêu cầu của JD vào DB: {db_err}")
 
         total_prompt = extract_tokens.get("prompt_tokens", 0) + skill_tokens.get("prompt_tokens", 0)
         total_completion = extract_tokens.get("completion_tokens", 0) + skill_tokens.get("completion_tokens", 0)
@@ -216,8 +224,9 @@ def analyze_document_stream_mock(
         text_content: Optional[str] = None,
         doc_type: Literal["cv", "jd"] = "cv",
         skill_top_k: int = 5,
-        mock_dir: str = "app/services/analyze_skill_service/mock",  # Thư mục chứa các file mẫu (mock)
+        mock_dir: str = "app/services/analyze_skill_service/mock",
         user=None,
+        job_posting: Optional[JobPosting] = None,  # Thêm tham số job_posting
 ) -> Generator[dict[str, Any], None, None]:
     """Hàm chạy pipeline giả lập (Mock) bằng cách đọc dữ liệu có sẵn từ thư mục debug/mock để tiết kiệm token."""
     task_type = "cv_analysis" if doc_type == "cv" else "jd_analysis"
@@ -227,7 +236,8 @@ def analyze_document_stream_mock(
         "file_name": pdf_file.name if pdf_file else None,
         "has_text": bool(text_content),
         "doc_type": doc_type,
-        "skill_top_k": skill_top_k
+        "skill_top_k": skill_top_k,
+        "job_posting_id": job_posting.id if job_posting else None
     }
 
     # 1. Khởi tạo log PENDING trong DB
@@ -239,7 +249,6 @@ def analyze_document_stream_mock(
         input_payload=input_payload
     )
 
-    # Gửi sự kiện khởi tạo kèm Task ID cho client
     yield {
         "step": "init",
         "status": "PENDING",
@@ -257,9 +266,9 @@ def analyze_document_stream_mock(
         return {"step": step_name, "status": "PROCESSING", "message": message}
 
     try:
-        time.sleep(0.5)  # Giả lập độ trễ đọc file/mạng
+        time.sleep(0.5)
 
-        # [Bước 1] Đọc tài liệu (Đọc từ file text mẫu)
+        # [Bước 1] Đọc tài liệu
         text_file_path = os.path.join(mock_dir, f"step_1_{doc_type}_text.txt")
         if os.path.exists(text_file_path):
             with open(text_file_path, "r", encoding="utf-8") as f:
@@ -271,7 +280,7 @@ def analyze_document_stream_mock(
         yield update_progress(step_1_key, doc_text, "Đã đọc xong nội dung từ tài liệu (Mock)...")
         time.sleep(0.5)
 
-        # [Bước 2] Trích xuất facts (Đọc từ file JSON mẫu)
+        # [Bước 2] Trích xuất facts
         doc_label = "hồ sơ ứng tuyển (CV)" if doc_type == "cv" else "mô tả công việc (JD)"
         yield {"step": "step_2_start", "status": "PROCESSING",
                "message": f"Hệ thống đang đọc hiểu và phân tích nội dung từ {doc_label} (Mock)..."}
@@ -292,7 +301,7 @@ def analyze_document_stream_mock(
         yield update_progress("step_3_derived_skills_count", 8, "Đã xác định được danh sách kỹ năng liên quan (Mock).")
         time.sleep(0.5)
 
-        # [Bước 4] Candidates (Đọc từ file JSON mẫu)
+        # [Bước 4] Candidates
         candidates_file_path = os.path.join(mock_dir, f"step_4_skill_candidates_{doc_type}.json")
         skill_candidates_debug = []
         if os.path.exists(candidates_file_path):
@@ -306,7 +315,7 @@ def analyze_document_stream_mock(
                                   "Đã đối chiếu xong các kỹ năng cần thiết (Mock).")
         time.sleep(0.5)
 
-        # [Bước 5.1 & 5.2] AI Xác minh Skill & Dynamic Expansion (Đọc từ file JSON mẫu)
+        # [Bước 5.1 & 5.2] AI Xác minh Skill & Dynamic Expansion
         yield {"step": "step_5_start", "status": "PROCESSING",
                "message": "Trợ lý AI đang đánh giá mức độ thành thạo và hoàn thiện kết quả phân tích (Mock)..."}
 
@@ -320,7 +329,7 @@ def analyze_document_stream_mock(
                               "Đã hoàn tất đánh giá và tổng hợp kỹ năng (Mock).")
         time.sleep(0.5)
 
-        # Tổng hợp kết quả cuối cùng (Đọc từ file final result mẫu)
+        # Tổng hợp kết quả cuối cùng
         final_result_file_path = os.path.join(mock_dir, f"step_5_3_final_result_{doc_type}.json")
         if os.path.exists(final_result_file_path):
             with open(final_result_file_path, "r", encoding="utf-8") as f:
@@ -328,12 +337,18 @@ def analyze_document_stream_mock(
         else:
             final_result = skill_decisions_data
 
-        # Lưu vào DB nếu là CV và user đã đăng nhập
-        if user and user.is_authenticated and doc_type == "cv":
-            try:
-                save_student_analysis_result(user, final_result)
-            except Exception as db_err:
-                print(f"⚠️ Cảnh báo: Không thể lưu profile sinh viên vào DB: {db_err}")
+        # Lưu tự động vào DB theo loại tài liệu
+        if user and user.is_authenticated:
+            if doc_type == "cv":
+                try:
+                    save_student_analysis_result(user, final_result)
+                except Exception as db_err:
+                    print(f"⚠️ Cảnh báo: Không thể lưu profile sinh viên vào DB: {db_err}")
+            elif doc_type == "jd" and job_posting:
+                try:
+                    save_jd_analysis_result(job_posting, final_result)
+                except Exception as db_err:
+                    print(f"⚠️ Cảnh báo: Không thể lưu kỹ năng yêu cầu của JD vào DB: {db_err}")
 
         total_time = time.time() - pipeline_start
 
@@ -349,7 +364,6 @@ def analyze_document_stream_mock(
         }
         task_log.save()
 
-        # Yield kết quả cuối cùng cho client
         yield {
             "step": "completed",
             "status": "SUCCESS",
