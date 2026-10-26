@@ -38,21 +38,34 @@ export interface UserProfile {
 export const getLevelBadgeConfig = (level: string | null | undefined) => {
   if (!level) {
     return {
-      label: "Chưa đánh giá",
-      className: "bg-amber-50 text-amber-700 border-amber-200",
+      label: "⚠️ Chưa đánh giá",
+      // Dùng tông màu đỏ/hồng cảnh báo (rose) để tạo sự chú ý mạnh, kết hợp font đậm và bóng nhẹ
+      className: "bg-rose-50 text-rose-700 border-rose-300 font-semibold shadow-sm",
     };
   }
 
-  switch (level.toLowerCase()) {
+  switch (String(level).toLowerCase()) {
+    case "1":
     case "foundation":
-      return { label: "Nền tảng", className: "bg-surface-2 text-muted border-border" };
+      // Cấp 1: Nền tảng (Sắc Xám/Slate trung tính)
+      return { label: "1/4 Nền tảng", className: "bg-slate-100 text-slate-700 border-slate-200" };
+
+    case "2":
     case "applied":
-      return { label: "Thực hành", className: "bg-primary-soft text-primary border-border" };
+      // Cấp 2: Thực hành (Sắc Xanh dương/Blue)
+      return { label: "2/4 Thực hành", className: "bg-blue-50 text-blue-700 border-blue-200" };
+
+    case "3":
     case "proficient":
-      return { label: "Thành thạo", className: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+      // Cấp 3: Thành thạo (Sắc Xanh ngọc/Teal)
+      return { label: "3/4 Thành thạo", className: "bg-teal-50 text-teal-700 border-teal-200" };
+
+    case "4":
     case "advanced":
-      return { label: "Nâng cao", className: "bg-purple-50 text-purple-700 border-purple-200" };
+      // Cấp 4: Nâng cao (Sắc Vàng đồng/Amber)
+      return { label: "4/4 Nâng cao", className: "bg-amber-50 text-amber-800 border-amber-300 font-semibold" };
+
     default:
-      return { label: level, className: "bg-surface-2 text-muted border-border" };
+      return { label: String(level), className: "bg-slate-100 text-slate-700 border-slate-200" };
   }
 };

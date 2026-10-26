@@ -22,8 +22,7 @@ class StudentSkillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentSkill
-        fields = ["id", "skill", "skill_id", "level", "reasoning", "evidence", "status"]
-        read_only_fields = ["status"]
+        fields = ["id", "skill", "skill_id", "level", "reasoning", "evidence"]
 
 
 class SkillSerializer(serializers.ModelSerializer):

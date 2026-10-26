@@ -27,8 +27,7 @@ export interface HeaderProps {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { label: "Trang chủ", href: "/" },
-  { label: "Phân tích AI", href: "/analysis" },
-  { label: "Lịch sử phân tích", href: "/history" },
+  { label: "Tin tuyển dụng", href: "/job-postings" },
 ];
 
 const PROFILE_MENU_ITEMS = [

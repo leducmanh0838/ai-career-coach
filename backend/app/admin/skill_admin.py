@@ -26,7 +26,8 @@ class LearningResourceInline(admin.TabularInline):
     fields = ('level', 'title', 'url', 'description')
     ordering = ('level',)
     formfield_overrides = {
-        models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 30})},
+        # Tăng số rows lên (ví dụ: 4 hoặc 5)
+        models.TextField: {'widget': forms.Textarea(attrs={'rows': 4, 'cols': 30})},
     }
 
 
@@ -36,9 +37,9 @@ class InterviewQuestionInline(admin.TabularInline):
     extra = 1
     fields = ('level', 'question_text', 'sample_answer')
     ordering = ('level',)
-    # Thu nhỏ các ô câu hỏi và gợi ý trả lời lại
     formfield_overrides = {
-        models.TextField: {'widget': forms.Textarea(attrs={'rows': 2, 'cols': 30})},
+        # Tăng số rows lên (ví dụ: 4 hoặc 5) để không bị quá ngắn
+        models.TextField: {'widget': forms.Textarea(attrs={'rows': 4, 'cols': 30})},
     }
 
 

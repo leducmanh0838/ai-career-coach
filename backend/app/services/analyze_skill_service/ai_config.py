@@ -5,7 +5,9 @@ import django
 from django.core.management.base import CommandError
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-PROMPT_DIR = Path(__file__).resolve().parent.parent.parent / "prompts" # Điều chỉnh path tùy thực tế
+BASE_DIR = Path(__file__).resolve().parent
+
+PROMPT_DIR = BASE_DIR / "prompts" # Điều chỉnh path tùy thực tế
 
 def load_prompt(filename: str) -> str:
     path = PROMPT_DIR / filename
@@ -14,10 +16,10 @@ def load_prompt(filename: str) -> str:
             return file.read()
     return ""
 
-EXTRACT_CV_FACTS_SYSTEM_PROMPT = load_prompt("prompts/extract_cv_facts.txt")
-EXTRACT_JD_FACTS_SYSTEM_PROMPT = load_prompt("prompts/extract_jd_facts.txt")
-MATCH_CV_SKILLS_SYSTEM_PROMPT = load_prompt("prompts/match_cv_skills.txt")
-MATCH_JD_SKILLS_SYSTEM_PROMPT = load_prompt("prompts/match_jd_skills.txt")
+EXTRACT_CV_FACTS_SYSTEM_PROMPT = load_prompt("extract_cv_facts.txt")
+EXTRACT_JD_FACTS_SYSTEM_PROMPT = load_prompt("extract_jd_facts.txt")
+MATCH_CV_SKILLS_SYSTEM_PROMPT = load_prompt("match_cv_skills_with_ai.txt")
+MATCH_JD_SKILLS_SYSTEM_PROMPT = load_prompt("match_jd_skills_with_ai.txt")
 
 CRITICAL_MODEL = "gpt-4o"
 LIGHT_MODEL = "gpt-4o-mini"

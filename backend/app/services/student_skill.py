@@ -26,8 +26,7 @@ def save_student_analysis_result(user, analysis_data: dict):
                 skill=skill_instance,
                 level=item.get("level"),
                 reasoning=item.get("reasoning"),
-                evidence=item.get("evidence", []),
-                status=item.get("status", "matched"),
+                evidence=item.get("evidence", [])
             )
         )
 
