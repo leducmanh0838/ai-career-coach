@@ -1,8 +1,9 @@
-# app/views.py
 import json
 from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 from rest_framework import permissions
+
+from app.models import JobPosting
 from app.services.analyze_skill_service.orchestrator import analyze_document_stream, analyze_document_stream_mock
 
 
@@ -11,11 +12,17 @@ class DocumentAnalysisSSEView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Lấy dữ liệu từ request (hỗ trợ cả multipart/form-data hoặc application/json)
         pdf_file = request.FILES.get("pdf_file")
         text_content = request.data.get("text_content")
         doc_type = request.data.get("doc_type", "cv")
-        skill_top_k = int(request.data.get("skill_top_k", 5))
+        # skill_top_k = int(request.data.get("skill_top_k", 5))
+        skill_top_k = 5
+
+        job_id = request.data.get("job_posting_id") or request.data.get("job_id")
+        job_posting = None
+
+        if job_id and request.user.is_authenticated:
+            job_posting = JobPosting.objects.filter(pk=job_id, recruiter=request.user).first()
 
         raw_use_mock = request.data.get("use_mock", False)
         use_mock = str(raw_use_mock).lower() in ["true", "1", "yes"] or raw_use_mock is True
@@ -30,7 +37,8 @@ class DocumentAnalysisSSEView(APIView):
                         text_content=text_content,
                         doc_type=doc_type,
                         skill_top_k=skill_top_k,
-                        user=user
+                        user=user,
+                        job_posting=job_posting
                     )
                 else:
                     stream_generator = analyze_document_stream(
@@ -38,7 +46,8 @@ class DocumentAnalysisSSEView(APIView):
                         text_content=text_content,
                         doc_type=doc_type,
                         skill_top_k=skill_top_k,
-                        user=user
+                        user=user,
+                        job_posting=job_posting
                     )
 
                 for event_data in stream_generator:

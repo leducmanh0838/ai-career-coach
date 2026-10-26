@@ -1,6 +1,7 @@
 # app/serializers/me_serializers.py
 from rest_framework import serializers
 from app.models import CustomUser, StudentProfile, Skill, StudentSkill
+from app.serializers.job_posting_serializers import JobPostingSerializer
 
 
 class StudentProfileUpdateSerializer(serializers.ModelSerializer):
@@ -74,4 +75,22 @@ class UserMeDetailSerializer(serializers.ModelSerializer):
             "phone_number",
             "avatar_url",
             "student_profile",
+        ]
+
+
+class UserRecruiterDetailSerializer(serializers.ModelSerializer):
+    job_postings = JobPostingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "phone_number",
+            "avatar_url",
+            "job_postings",
         ]
