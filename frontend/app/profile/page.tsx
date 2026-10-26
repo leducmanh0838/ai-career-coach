@@ -2,15 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext"; // Import useAuth từ context của bạn
 import { useCV } from "@/context/CVContext";
 import { UserProfile } from "./_types";
 import ProfileSidebar from "./_components/ProfileSidebar";
 import ProfileSummaryCard from "./_components/ProfileSummaryCard";
 import ProfileSkillsCard from "./_components/ProfileSkillsCard";
 import UploadCVModal from "./_components/UploadCVModal";
+import RecruiterJobManager from "./_components/RecruiterJobManager"; // Component quản lý job của recruiter
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth(); // Lấy thông tin user và trạng thái load từ AuthContext
   const { setSelectedFile } = useCV();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -21,21 +24,31 @@ export default function ProfilePage() {
   const [tempFile, setTempFile] = useState<File | null>(null);
 
   const fetchProfile = useCallback(async () => {
+    // Nếu chưa có thông tin user sau khi AuthProvider đã load xong thì chuyển hướng về login
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/api/me/detail/`, {
+      setLoading(true);
+      // Xác định endpoint dựa vào role của user từ AuthContext
+      const endpoint = user.role === "recruiter" ? "/api/me/recruiter/" : "/api/me/student/";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
+      const res = await fetch(`${apiUrl}${endpoint}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include", // Gửi kèm cookie xác thực
       });
 
-      // Nếu lỗi xác thực (401 Unauthorized hoặc 403 Forbidden), chuyển hướng ngay về /login
       if (res.status === 401 || res.status === 403) {
         router.push("/login");
         return;
       }
 
       if (!res.ok) {
-        throw new Error("Không thể tải thông tin hồ sơ. Vui lòng đăng nhập lại.");
+        throw new Error("Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.");
       }
 
       const data: UserProfile = await res.json();
@@ -45,11 +58,14 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [user, router]);
 
   useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+    // Chỉ gọi API khi AuthProvider đã xác thực xong (isLoading === false)
+    if (!isAuthLoading) {
+      fetchProfile();
+    }
+  }, [isAuthLoading, fetchProfile]);
 
   const handleProceedToAnalyze = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +75,8 @@ export default function ProfilePage() {
     router.push("/profile/analyze");
   };
 
-  if (loading) {
+  // Hiển thị trạng thái đang tải chung (của cả Auth và Profile)
+  if (isAuthLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg text-muted">
         <div className="flex items-center space-x-3">
@@ -94,6 +111,9 @@ export default function ProfilePage() {
 
   if (!profile) return null;
 
+  // Kiểm tra role trực tiếp từ user trong AuthContext hoặc profile trả về từ API
+  const isRecruiter = user?.role === "recruiter";
+
   return (
     <div className="min-h-screen bg-bg text-text relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
@@ -105,36 +125,46 @@ export default function ProfilePage() {
             onOpenUploadModal={() => setIsUploadModalOpen(true)}
           />
 
-          {/* CỘT PHẢI: THÔNG TIN CHI TIẾT & KỸ NĂNG */}
+          {/* CỘT PHẢI: PHÂN TÁCH GIAO DIỆN THEO VAI TRÒ */}
           <div className="flex-1 space-y-6">
-            <ProfileSummaryCard
-              studentProfile={profile.student_profile}
-              onOpenUploadModal={() => setIsUploadModalOpen(true)}
-              onProfileUpdate={(updatedData) => {
-                setProfile((prev) => {
-                  if (!prev || !prev.student_profile) return prev;
-                  return {
-                    ...prev,
-                    student_profile: {
-                      ...prev.student_profile,
-                      ...updatedData,
-                    },
-                  };
-                });
-              }}
-            />
+            {isRecruiter ? (
+              /* GIAO DIỆN NHÀ TUYỂN DỤNG: Quản lý danh sách Job Posting */
+              <RecruiterJobManager
+                initialJobs={(profile as any).job_postings || []}
+                onJobsChange={fetchProfile}
+              />
+            ) : (
+              /* GIAO DIỆN SINH VIÊN: Giữ nguyên các component cũ */
+              <>
+                <ProfileSummaryCard
+                  studentProfile={profile.student_profile}
+                  onOpenUploadModal={() => setIsUploadModalOpen(true)}
+                  onProfileUpdate={(updatedData) => {
+                    setProfile((prev) => {
+                      if (!prev || !prev.student_profile) return prev;
+                      return {
+                        ...prev,
+                        student_profile: {
+                          ...prev.student_profile,
+                          ...updatedData,
+                        },
+                      };
+                    });
+                  }}
+                />
 
-            {/* TRUYỀN HÀM fetchProfile VÀO onProfileUpdate CỦA KỸ NĂNG */}
-            <ProfileSkillsCard
-              skills={profile.student_profile?.student_skills || []}
-              onProfileUpdate={fetchProfile} 
-            />
+                <ProfileSkillsCard
+                  skills={profile.student_profile?.student_skills || []}
+                  onProfileUpdate={fetchProfile}
+                />
+              </>
+            )}
           </div>
 
         </div>
       </div>
 
-      {/* MODAL TẢI CV */}
+      {/* MODAL TẢI CV (Chỉ dành cho sinh viên) */}
       <UploadCVModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}

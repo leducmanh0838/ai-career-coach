@@ -1,3 +1,4 @@
+import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 
 // Kiểu dữ liệu khớp với Django model JobPosting
@@ -8,6 +9,7 @@ interface JobPosting {
     status: "draft" | "published" | "closed";
     created_at: string;
     recruiter: number | { id: number; username?: string; email?: string };
+    image?: string | null;
 }
 
 // Hàm fetch danh sách từ Django API
@@ -50,7 +52,7 @@ export default async function JobsPage({
             case "draft":
                 return (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-medium bg-surface-2 text-muted border border-border">
-                        Bản nháp
+                         Bản nháp
                     </span>
                 );
             case "closed":
@@ -81,7 +83,7 @@ export default async function JobsPage({
                         type="text"
                         name="search"
                         defaultValue={searchQuery}
-                        placeholder="Tìm kiếm theo tiêu đề hoặc mô tả..."
+                        placeholder="Tìm kiếm theo tiêu đề..."
                         className="flex-1 bg-surface border border-border rounded-md px-4 py-3 text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                     />
                     <button
@@ -103,24 +105,38 @@ export default async function JobsPage({
                             <Link
                                 key={job.id}
                                 href={`/job-postings/${job.id}`}
-                                className="block bg-surface border border-border rounded-lg p-6 hover:shadow-sm hover:border-primary transition-all group"
+                                className="block bg-surface border border-border rounded-lg p-5 hover:shadow-sm hover:border-primary transition-all group"
                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                                    <h2 className="text-xl font-semibold text-text group-hover:text-primary transition-colors">
-                                        {job.title}
-                                    </h2>
-                                    {renderStatusBadge(job.status)}
-                                </div>
-                                <p className="text-muted line-clamp-2 text-sm mb-4">
-                                    {job.description}
-                                </p>
-                                <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-border">
-                                    <span>
-                                        Ngày đăng: {new Date(job.created_at).toLocaleDateString("vi-VN")}
-                                    </span>
-                                    <span className="text-primary font-medium group-hover:underline">
-                                        Xem chi tiết &rarr;
-                                    </span>
+                                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                                    {/* Phần hiển thị ảnh công việc / logo */}
+                                    <div className="relative w-full sm:w-24 h-36 sm:h-24 flex-shrink-0 rounded-md overflow-hidden bg-surface-2 border border-border">
+                                        <SafeImage
+                                            src={job.image}
+                                            alt={job.title}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            fallback="/default-image.png" 
+                                        />
+                                    </div>
+
+                                    {/* Phần nội dung thông tin */}
+                                    <div className="flex-1 w-full min-w-0">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                                            <h2 className="text-xl font-semibold text-text group-hover:text-primary transition-colors">
+                                                {job.title}
+                                            </h2>
+                                            {renderStatusBadge(job.status)}
+                                        </div>
+
+                                        <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-border">
+                                            <span>
+                                                Ngày đăng: {new Date(job.created_at).toLocaleDateString("vi-VN")}
+                                            </span>
+                                            <span className="text-primary font-medium group-hover:underline">
+                                                Xem chi tiết &rarr;
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </Link>
                         ))}

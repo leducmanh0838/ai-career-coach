@@ -12,11 +12,12 @@ import {
   ShieldCheck,
   AlertCircle
 } from "lucide-react";
+import { getLevelBadgeConfig } from "../_types";
 
 function AnalyzeCVPage() {
   const { selectedFile } = useCV();
 
-  const [useMock] = useState<boolean>(true);
+  const [useMock] = useState<boolean>(false);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [progressPercent, setProgressPercent] = useState<number>(10);
   const [analysisResult, setAnalysisResult] = useState<any | null>(null);
@@ -39,17 +40,6 @@ function AnalyzeCVPage() {
       }
     } catch (err) {
       console.error("Lỗi tải danh sách kỹ năng sinh viên:", err);
-    }
-  };
-
-  const getLevelBadgeConfig = (level: string | null | undefined) => {
-    if (!level) return { label: "Chưa đánh giá", className: "bg-amber-50 text-amber-700 border-amber-200" };
-    switch (level.toLowerCase()) {
-      case "foundation": return { label: "Nền tảng", className: "bg-surface-2 text-muted border-border" };
-      case "applied": return { label: "Thực hành", className: "bg-primary-soft text-primary border-border" };
-      case "proficient": return { label: "Thành thạo", className: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-      case "advanced": return { label: "Nâng cao", className: "bg-purple-50 text-purple-700 border-purple-200" };
-      default: return { label: level, className: "bg-surface-2 text-muted border-border" };
     }
   };
 
@@ -151,7 +141,6 @@ function AnalyzeCVPage() {
   };
 
   const handleOpenEditSkill = (item: any) => {
-    // Tìm record tương ứng trong studentSkills dựa vào ID hoặc skill ID
     const existingRecord = studentSkills.find(
       (s) => s.id === item.id || s.skill?.id === item.skill_id || s.skill === item.skill_id
     );
@@ -197,7 +186,6 @@ function AnalyzeCVPage() {
 
       if (!res.ok) throw new Error("Không thể xóa kỹ năng.");
 
-      // Tải lại danh sách từ DB ngay lập tức cập nhật giao diện
       fetchStudentSkills();
     } catch (err: any) {
       alert(err.message || "Lỗi khi xóa kỹ năng.");
