@@ -709,3 +709,58 @@ class InterviewQuestion(models.Model):
     def __str__(self):
         target = self.skill.name if self.skill else "General"
         return f"[{target} - {self.get_level_display()}] {self.question_text[:50]}..."
+
+
+class JobApplication(models.Model):
+    """Quản lý việc sinh viên ứng tuyển vào tin tuyển dụng và kết quả đánh giá khoảng cách kỹ năng."""
+
+    student_profile = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE,
+        related_name="applications",
+        verbose_name="Hồ sơ sinh viên",
+    )
+    job_posting = models.ForeignKey(
+        JobPosting,
+        on_delete=models.CASCADE,
+        related_name="applications",
+        verbose_name="Tin tuyển dụng",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian ứng tuyển")
+
+    class Meta:
+        db_table = "job_applications"
+        unique_together = ("student_profile", "job_posting")
+        verbose_name = "Đơn ứng tuyển"
+        verbose_name_plural = "Danh sách đơn ứng tuyển"
+
+    def __str__(self):
+        return f"{self.student_profile.user.username} - {self.job_posting.title}"
+
+
+class PersonalizedRoadmap(models.Model):
+    """Lộ trình học tập cá nhân hóa cho sinh viên đối với một job cụ thể."""
+    application = models.ForeignKey(
+        JobApplication,
+        on_delete=models.CASCADE,
+        related_name="roadmaps",
+        verbose_name="Đơn ứng tuyển liên quan",
+    )
+    skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        verbose_name="Kỹ năng cần bổ sung",
+    )
+    target_level = models.CharField(
+        max_length=50,
+        choices=SkillLevel.choices,
+        verbose_name="Cấp độ mục tiêu",
+    )
+
+    class Meta:
+        db_table = "personalized_roadmaps"
+        verbose_name = "Lộ trình học tập cá nhân"
+        verbose_name_plural = "Danh sách lộ trình học tập cá nhân"
+
+    def __str__(self):
+        return f"Lộ trình: {self.skill.name}"

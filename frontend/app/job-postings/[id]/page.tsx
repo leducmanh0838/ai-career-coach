@@ -34,7 +34,6 @@ export default function JobPostingDetailPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  // Hàm fetch chi tiết tin tuyển dụng (có tham số showLoading để tránh bị giật cuộn trang)
   const fetchJobDetail = useCallback(async (showLoading = false) => {
     if (!jobId) return;
 
@@ -64,7 +63,7 @@ export default function JobPostingDetailPage() {
   }, [jobId]);
 
   useEffect(() => {
-    fetchJobDetail(true); // Lần đầu tiên load trang thì bật trạng thái loading
+    fetchJobDetail(true);
   }, [fetchJobDetail]);
 
   if (loading) {
@@ -97,13 +96,20 @@ export default function JobPostingDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      {/* Nút quay lại & Nút chuyển sang trang phân tích AI */}
+      {/* Nút quay lại & Nút Ứng tuyển / Xem lộ trình */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
           className="text-sm font-medium text-muted hover:text-text transition flex items-center gap-1"
         >
           ← Quay lại danh sách
+        </button>
+
+        <button
+          onClick={() => router.push(`/job-postings/${jobId}/roadmap`)}
+          className="px-5 py-2.5 bg-primary text-on-primary rounded-lg text-sm font-semibold shadow hover:opacity-90 transition flex items-center gap-2"
+        >
+          🚀 Ứng tuyển & Xem Lộ trình Học tập
         </button>
       </div>
 

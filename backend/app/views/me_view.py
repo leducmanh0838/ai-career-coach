@@ -63,7 +63,6 @@ class StudentSkillViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsStudentRole]
 
     def get_queryset(self):
-        print("CURRENT USER REQUESTING:", self.request.user)  # Thêm dòng này để nhìn log terminal
         profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
         return StudentSkill.objects.filter(student_profile=profile).select_related("skill")
 
