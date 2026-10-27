@@ -50,3 +50,15 @@ The inventories should be regenerated and reviewed when dependencies are added, 
 ## 4. Disclaimer
 
 This document is provided for software license transparency and compliance review. It is not legal advice and does not, by itself, constitute a guarantee that all third-party licensing obligations have been satisfied.
+
+## 5. Packages Requiring Additional License Review
+
+The automated npm license inventory identifies the following packages for additional review:
+
+- `@img/sharp-win32-x64@0.35.5` — reported as `Apache-2.0 AND LGPL-3.0-or-later`. Review the package's license file and bundled third-party libraries, including applicable LGPL notices and redistribution conditions.
+- `lightningcss@1.32.0` and `lightningcss@1.33.0` — reported as `MPL-2.0`.
+- `lightningcss-win32-x64-msvc@1.32.0` and `lightningcss-win32-x64-msvc@1.33.0` — reported as `MPL-2.0`.
+
+These packages are subject to further verification of their actual use, distribution scope, license texts, and applicable notice or source-disclosure obligations. Their presence in the development environment alone does not establish that they are distributed as part of the released application.
+
+Review status: Pending verification against the corresponding package license files and deployment artifacts.
