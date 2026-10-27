@@ -20,7 +20,7 @@
 
 FROM node:24-slim
 
-# Cài đặt chứng chỉ CA để fix lỗi TLS của Miniflare/workerd
+# Cài đặt chứng chỉ CA nếu cần
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -28,13 +28,16 @@ WORKDIR /app
 # Copy các file cấu hình package
 COPY package.json package-lock.json* ./
 
-# Cài đặt bằng npm
-RUN npm install --include=optional
+# Cài đặt toàn bộ dependencies (bao gồm devDependencies để phục vụ cho việc build)
+RUN npm install
 
-# Copy toàn bộ mã nguồn
+# Copy toàn bộ mã nguồn vào container
 COPY . .
+
+# Tiến hành Build ứng dụng ra thư mục dist (hoặc thư mục build của vinext)
+RUN npm run build
 
 EXPOSE 5174
 
-# Chạy dev server bằng npm
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5174"]
+# Chạy ứng dụng ở chế độ production (dùng lệnh preview hoặc start tùy theo package.json của vinext)
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "5174"]
