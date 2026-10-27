@@ -1,3 +1,4 @@
+# v0.1.0-alpha
 ## What's Changed
 * feat: create User, skill tables by @leducmanh0838 in https://github.com/leducmanh0838/ai-career-coach/pull/2
 * Fix: Add vector in skill table by @leducmanh0838 in https://github.com/leducmanh0838/ai-career-coach/pull/4
@@ -25,3 +26,13 @@
 
 
 **Full Changelog**: https://github.com/leducmanh0838/ai-career-coach/commits/v0.1.0-alpha
+
+# v1.0.0 - Initial Production Release
+## What's Changed
+* Page job-postings by @cthanhdev in https://github.com/leducmanh0838/ai-career-coach/pull/52
+* fix profile by @leducmanh0838 in https://github.com/leducmanh0838/ai-career-coach/pull/53
+* Manh by @leducmanh0838 in https://github.com/leducmanh0838/ai-career-coach/pull/54
+* 55 by @leducmanh0838 in https://github.com/leducmanh0838/ai-career-coach/pull/56
+
+
+**Full Changelog**: https://github.com/leducmanh0838/ai-career-coach/compare/v0.1.0-alpha...v1.0.0
