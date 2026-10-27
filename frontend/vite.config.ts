@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => {
     define: {
       "process.env.GOOGLE_CLIENT_ID": JSON.stringify(googleClientId),
     },
+    server: {
+      allowedHosts: true, // Cho phép mọi host truy cập
+    },
     plugins: [
       vinext({
         images: { optimizer: imagesOptimizer() },
