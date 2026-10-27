@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import SkillDetailModal from "@/components/skill/SkillDetailModal";
 
 interface SkillItem {
     skill_id: string;
@@ -47,12 +48,19 @@ interface ApplicationData {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
-// Bảng quy đổi cấp độ tương ứng với backend để so sánh cao thấp
+// Bảng quy đổi cấp độ sang thang số (1/4 -> 4/4)
 const levelHierarchy: Record<string, number> = {
     "Foundation": 1,
     "Applied": 2,
     "Proficient": 3,
     "Advanced": 4,
+};
+
+// Hàm chuyển đổi Level dạng chữ sang dạng phân số "X/4"
+const formatLevelFraction = (lvl: string | null | undefined): string => {
+    if (!lvl) return "0/4";
+    const score = levelHierarchy[lvl];
+    return score ? `${score}/4` : "0/4";
 };
 
 const getLevelScore = (lvl: string | null | undefined) => {
@@ -68,6 +76,9 @@ export default function JobRoadmapPage() {
     const [data, setData] = useState<ApplicationData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
+
+    // State quản lý Modal
+    const [selectedSkillModal, setSelectedSkillModal] = useState<RoadmapItem | null>(null);
 
     const fetchAndApplyRoadmap = useCallback(async () => {
         if (!jobId) return;
@@ -102,7 +113,7 @@ export default function JobRoadmapPage() {
     const handleCancelApplication = async () => {
         if (!confirm("Bạn có chắc chắn muốn hủy đơn ứng tuyển và xóa lộ trình học tập này không?")) return;
         try {
-            const res = await fetch(`${API_URL}/api/job-postings/${jobId}/apply/`, {
+            const res = await fetch(`${API_URL}/api/jobs/${jobId}/apply/`, {
                 method: "DELETE",
                 credentials: "include",
             });
@@ -142,12 +153,10 @@ export default function JobRoadmapPage() {
         );
     }
 
-    // Xử lý so sánh kỹ năng của sinh viên với yêu cầu của job
     const studentSkillMap = new Map(data.student_skills.map(s => [s.skill_id, s.level]));
 
     const evaluatedJobSkills = data.job_required_skills.map(req => {
         const studentLevel = studentSkillMap.get(req.skill_id) || null;
-        // Đạt chuẩn nếu level của sinh viên >= level yêu cầu của job
         const isPassed = getLevelScore(studentLevel) >= getLevelScore(req.level);
         return {
             ...req,
@@ -159,7 +168,7 @@ export default function JobRoadmapPage() {
     const passedCount = evaluatedJobSkills.filter(s => s.isPassed).length;
 
     return (
-        <div className="max-w-6xl mx-auto p-6 space-y-8">
+        <div className="max-w-6xl mx-auto p-6 space-y-8 relative">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
                 <div>
@@ -180,7 +189,7 @@ export default function JobRoadmapPage() {
                 </button>
             </div>
 
-            {/* Phần 1: Tổng quan Skill Gap (So sánh kỹ năng) */}
+            {/* Phần 1: Tổng quan Skill Gap (So sánh kỹ năng với thang 1/4 -> 4/4) */}
             <div className="grid md:grid-cols-2 gap-6">
                 {/* Kỹ năng yêu cầu của Job */}
                 <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
@@ -193,13 +202,13 @@ export default function JobRoadmapPage() {
                     <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1">
                         {data.job_required_skills.map((item, idx) => (
                             <span key={idx} className="text-xs bg-surface-2 border border-border px-2.5 py-1 rounded-md text-text">
-                                {item.skill_name} <strong className="text-primary">({item.level || "N/A"})</strong>
+                                {item.skill_name_vi || item.skill_name} <strong className="text-primary">({formatLevelFraction(item.level)})</strong>
                             </span>
                         ))}
                     </div>
                 </div>
 
-                {/* Kỹ năng hiện tại của Sinh viên (Lọc theo kỹ năng job yêu cầu và so sánh level) */}
+                {/* Kỹ năng hiện tại của Sinh viên */}
                 <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-3">
                     <h2 className="text-md font-semibold text-text flex items-center justify-between">
                         <span>🎒 Hồ sơ của bạn (so với Job)</span>
@@ -217,7 +226,7 @@ export default function JobRoadmapPage() {
                                         : "bg-red-50/50 border-red-200 text-red-700"
                                 }`}
                             >
-                                {item.skill_name}: <strong>{item.studentLevel || "Chưa có"}</strong> (Cần: {item.level})
+                                {item.skill_name_vi || item.skill_name}: <strong>{formatLevelFraction(item.studentLevel)}</strong> (Cần: {formatLevelFraction(item.level)})
                             </span>
                         ))}
                     </div>
@@ -230,6 +239,7 @@ export default function JobRoadmapPage() {
                     <h2 className="text-lg font-bold text-text">
                         📚 Lộ trình Bổ sung Kiến thức & Luyện tập ({data.roadmaps.length} kỹ năng cần cải thiện)
                     </h2>
+                    <span className="text-xs text-muted">💡 Click vào từng kỹ năng để xem tài liệu & câu hỏi luyện tập</span>
                 </div>
 
                 {data.roadmaps.length === 0 ? (
@@ -237,74 +247,41 @@ export default function JobRoadmapPage() {
                         🎉 Chúc mừng! Hồ sơ của bạn đã đáp ứng hoặc vượt mức toàn bộ các kỹ năng yêu cầu của vị trí này. Bạn có thể sẵn sàng bước vào vòng phỏng vấn!
                     </div>
                 ) : (
-                    <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-4">
                         {data.roadmaps.map((item, index) => (
-                            <div key={item.id} className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-4">
-                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+                            <div 
+                                key={item.id} 
+                                onClick={() => setSelectedSkillModal(item)}
+                                className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:border-primary cursor-pointer transition flex flex-col justify-between space-y-3 group"
+                            >
+                                <div className="flex items-start justify-between gap-2">
                                     <div>
                                         <span className="text-xs font-bold text-muted uppercase">Bước {index + 1}</span>
-                                        <h3 className="text-lg font-bold text-text">
-                                            {item.skill_name}
+                                        <h3 className="text-base font-bold text-text group-hover:text-primary transition">
+                                            {item.skill_name_vi || item.skill_name}
                                         </h3>
                                     </div>
-                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-semibold">
-                                        Mục tiêu đạt: {item.target_level}
+                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full font-semibold">
+                                        Mục tiêu: {formatLevelFraction(item.target_level)}
                                     </span>
                                 </div>
-
-                                {/* Tài liệu học tập gợi ý */}
-                                <div>
-                                    <h4 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
-                                        📖 Tài liệu học tập & Chủ đề ôn tập
-                                    </h4>
-                                    {item.learning_resources.length === 0 ? (
-                                        <p className="text-xs text-muted italic">Đang chờ Quản trị viên cập nhật tài liệu học tập cho kỹ năng này.</p>
-                                    ) : (
-                                        <div className="space-y-2">
-                                            {item.learning_resources.map((res) => (
-                                                <div key={res.id} className="p-3 bg-surface-2/50 border border-border rounded-lg space-y-1">
-                                                    <a
-                                                        href={res.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-sm font-semibold text-primary hover:underline flex items-center gap-1"
-                                                    >
-                                                        🔗 {res.title}
-                                                    </a>
-                                                    <p className="text-xs text-muted">{res.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Câu hỏi phỏng vấn luyện tập */}
-                                <div>
-                                    <h4 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
-                                        💡 Câu hỏi phỏng vấn mô phỏng
-                                    </h4>
-                                    {item.interview_questions.length === 0 ? (
-                                        <p className="text-xs text-muted italic">Đang cập nhật bộ câu hỏi phỏng vấn...</p>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            {item.interview_questions.map((q) => (
-                                                <div key={q.id} className="p-3.5 bg-surface-2/30 border border-border rounded-lg space-y-2">
-                                                    <p className="text-sm font-medium text-text">❓ {q.question_text}</p>
-                                                    {q.sample_answer && (
-                                                        <div className="text-xs text-muted bg-surface p-2.5 rounded border border-border/60">
-                                                            <strong className="text-text">Gợi ý trả lời / Ý chính:</strong> {q.sample_answer}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                <div className="flex items-center justify-between text-xs text-muted pt-2 border-t border-border">
+                                    <span>📖 {item.learning_resources.length} tài liệu học</span>
+                                    <span>💡 {item.interview_questions.length} câu hỏi phỏng vấn</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Gọi Component Modal đã tách rời */}
+            <SkillDetailModal
+                isOpen={!!selectedSkillModal}
+                onClose={() => setSelectedSkillModal(null)}
+                skillItem={selectedSkillModal}
+                formatLevelFraction={formatLevelFraction}
+            />
         </div>
     );
 }
