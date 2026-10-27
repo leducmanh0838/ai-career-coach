@@ -71,8 +71,29 @@
 git clone https://github.com/leducmanh0838/ai-career-coach.git
 cd ai-career-coach
 ```
+2. Cấu hình biến môi trường .env
 
-2. Chạy toàn bộ bằng Docker
+Trước khi chạy, cấu hình môi trường:
+```bash
+SECRET_KEY=your_django_secret_key
+
+DB_NAME=ai_career_coach
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+DB_HOST=localhost
+DB_PORT=5432
+
+OPENAI_API_KEY=your_openai_api_key
+
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DEBUG=True
+ALLOWED_HOSTS=*
+
+NEXT_PUBLIC_API_URL=http://localhost:8001
+```
+
+3. Chạy toàn bộ bằng Docker
 
 ```bash
 docker-compose up --build
