@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from app.models import JobPosting, PersonalizedRoadmap, StudentSkill, JobApplication
+from app.models import JobPosting, PersonalizedRoadmap, StudentSkill, JobApplication, Skill
 from ..serializers.apply_serializers import JobApplicationSerializer
 from ..services.apply_service import CareerCoachService
+from ..services.interview_grading_service import InterviewGradingService
 
 
 class ApplyJobAPIView(APIView):
@@ -56,44 +57,60 @@ class ApplyJobAPIView(APIView):
 
 class SubmitInterviewAnswerAPIView(APIView):
     """
-    API nộp câu trả lời phỏng vấn:
-    - Gọi AI chấm điểm (Giả lập hoặc tích hợp OpenAI/Gemini API thực tế trả về điểm từ 0-10).
-    - Nếu điểm > 5: Pass -> Cập nhật/Tạo mới StudentSkill lên target_level tương ứng.
+    API nhận danh sách câu trả lời phỏng vấn theo kỹ năng của sinh viên,
+    chấm gộp qua LangChain/OpenAI và tự động cập nhật StudentSkill nếu đạt >= 5.
     """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        student_profile = request.user.student_profile
-        skill_id = request.data.get("skill_id")
-        target_level = request.data.get("target_level")
-        student_answer = request.data.get("answer")
-
-        if not all([skill_id, target_level, student_answer]):
-            return Response({"error": "Thiếu thông tin (skill_id, target_level, answer)."},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        # --- PHẦN TÍCH HỢP AI CHẤM ĐIỂM (Ví dụ gọi LLM) ---
-        # score = call_openai_grading_api(student_answer)
-        score = 7.5  # Giả định AI chấm được 7.5 điểm
-        ai_feedback = "Câu trả lời tốt, nắm vững khái niệm cốt lõi."
-        # ---------------------------------------------------
-
-        passed = score > 5.0
-
-        if passed:
-            # Cập nhật hoặc tạo mới kỹ năng cho sinh viên trong profile
-            StudentSkill.objects.update_or_create(
-                student_profile=student_profile,
-                skill_id=skill_id,
-                defaults={
-                    "level": target_level,
-                    "reasoning": f"Đã vượt qua bài kiểm tra phỏng vấn mô phỏng với điểm số {score}/10."
-                }
+        try:
+            student_profile = request.user.student_profile
+        except AttributeError:
+            return Response(
+                {"error": "Tài khoản hiện tại không phải là hồ sơ sinh viên."},
+                status=status.HTTP_403_FORBIDDEN
             )
 
+        skill_id = request.data.get("skill_id")
+        level = request.data.get("level")  # Ví dụ: "Foundation", "Applied", "Proficient", "Advanced"
+        answers = request.data.get("answers", [])  # Danh sách gồm: [{ "question_id": "...", "user_answer": "..." }]
+
+        if not skill_id or not level or not answers:
+            return Response(
+                {"error": "Thiếu thông tin bắt buộc: skill_id, level hoặc danh sách answers."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            skill = Skill.objects.get(id=skill_id)
+        except Skill.DoesNotExist:
+            return Response(
+                {"error": "Kỹ năng không tồn tại trong hệ thống."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Gọi service chấm gộp đã tối ưu hóa token
+        evaluation_result = InterviewGradingService.evaluate_interview_submission(
+            student_profile=student_profile,
+            skill=skill,
+            level=level,
+            answers_payload=answers
+        )
+
+        if "error" in evaluation_result and not evaluation_result.get("details"):
+            return Response(
+                {"error": evaluation_result["error"]},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        passed = evaluation_result.get("passed", False)
+        message = (
+            "🎉 Chúc mừng bạn đã vượt qua bài kiểm tra kỹ năng!"
+            if passed
+            else "💪 Bạn chưa đạt điểm tối thiểu (>= 5.0/10). Hãy xem lại tài liệu ôn tập và thử lại nhé!"
+        )
+
         return Response({
-            "score": score,
-            "passed": passed,
-            "feedback": ai_feedback,
-            "message": "Chúc mừng bạn đã vượt qua! Kỹ năng trong hồ sơ đã được cập nhật." if passed else "Điểm chưa đạt yêu cầu (<= 5), hãy ôn tập thêm tài liệu."
+            "message": message,
+            "data": evaluation_result
         }, status=status.HTTP_200_OK)

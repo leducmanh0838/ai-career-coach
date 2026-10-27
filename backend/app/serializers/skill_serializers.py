@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import StudentSkill, Skill
+from app.models import StudentSkill, Skill, SkillDependency, LearningResource, InterviewQuestion
 
 
 class SkillBasicSerializer(serializers.ModelSerializer):
@@ -32,3 +32,24 @@ class SkillSerializer(serializers.ModelSerializer):
             "id", "name", "name_vi", "skill_type",
             "synonyms", "description", "synonyms_vi", "description_vi", "is_verified"
         ]
+
+
+class SkillDependencySerializer(serializers.ModelSerializer):
+    related_skill = SkillBasicSerializer(read_only=True)
+    relation_type_display = serializers.CharField(source='get_relation_type_display', read_only=True)
+
+    class Meta:
+        model = SkillDependency
+        fields = ['id', 'related_skill', 'relation_type', 'relation_type_display']
+
+
+class LearningResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LearningResource
+        fields = ['id', 'title', 'url', 'description', 'level']
+
+
+class InterviewQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewQuestion
+        fields = ['id', 'question_text', 'sample_answer', 'level']

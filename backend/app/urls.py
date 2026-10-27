@@ -30,6 +30,12 @@ urlpatterns = [
     path('me/student-profile/', StudentProfileView.as_view(), name='me-student-profile'),
     path('job-postings/<int:job_id>/apply/', ApplyJobAPIView.as_view(), name='api-apply-job'),
     path('interview/submit/', SubmitInterviewAnswerAPIView.as_view(), name='api-submit-interview'),
+
+    path('skills/<path:pk>/dependencies/', SkillViewSet.as_view({'get': 'dependencies'}), name='skill-dependencies'),
+    path('skills/<path:pk>/learning-resources/', SkillViewSet.as_view({'get': 'learning_resources'}),
+         name='skill-learning-resources'),
+    path('skills/<path:pk>/interview-questions/', SkillViewSet.as_view({'get': 'interview_questions'}),
+         name='skill-interview-questions'),
 ]
 
 # Tự động cộng dồn các đường dẫn từ Router vào urlpatterns
