@@ -16,7 +16,7 @@
 ## 🎯 Mục tiêu của dự án
 
 - 📄 **Phân tích & Đánh giá năng lực (Skill Gap Analysis):**  
-  Tự động bóc tách dữ liệu từ **CV của sinh viên** và **mô tả công việc (JD)**, so sánh để xác định chính xác điểm mạnh, điểm yếu và tỷ lệ phù hợp (Match Level).
+  AI đọc **CV của sinh viên** hoặc **mô tả công việc (JD)**, trích xuất các skill, đánh giá level của mỗi skill dựa vào dự án thực tế, kinh nghiệm,.... Từ đó AI so sánh level của từng skill, đưa ra lộ trình học tập phù hợp .
 
 - 🗺️ **Lộ trình học tập cá nhân hóa:**  
   Đề xuất lộ trình nâng cao kỹ năng, gợi ý tài liệu ôn tập và bài tập thực hành từ database phù hợp với khoảng cách năng lực của sinh viên.
