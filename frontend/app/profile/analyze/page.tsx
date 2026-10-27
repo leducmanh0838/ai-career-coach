@@ -3,7 +3,7 @@
 import { memo, useEffect, useState } from "react";
 import Link from "next/link";
 import { useCV } from "@/context/CVContext";
-import SkillModal from "../_components/SkillModal";
+import SkillModal from "../../../components/skill/SkillModal";
 import {
   Cpu,
   BrainCircuit,

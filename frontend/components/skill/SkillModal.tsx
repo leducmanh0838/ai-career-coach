@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo } from "react";
-import { StudentSkill } from "../_types";
+import { StudentSkill } from "../../app/profile/_types";
 
 interface SkillModalProps {
     isOpen: boolean;

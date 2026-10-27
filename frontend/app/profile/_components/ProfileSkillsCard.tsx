@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { getLevelBadgeConfig, StudentSkill } from "../_types";
-import SkillModal from "./SkillModal";
+import SkillModal from "../../../components/skill/SkillModal";
 
 interface ProfileSkillsCardProps {
   skills: StudentSkill[];
