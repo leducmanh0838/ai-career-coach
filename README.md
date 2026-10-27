@@ -1,11 +1,13 @@
 # 🎯 AI Career Coach — Trợ lý định hướng nghề nghiệp và luyện phỏng vấn thông minh
 
+
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Backend](https://img.shields.io/badge/Backend-Django_&_DRF-092E20?logo=django)]()
-[![AI Framework](https://img.shields.io/badge/AI-LangChain_&_LangGraph-1C3C3C)]()
-[![LLM](https://img.shields.io/badge/LLM-OpenAI_GPT--4o-00b3ff?logo=openai)]()
-[![Frontend](https://img.shields.io/badge/Frontend-Next.js_TypeScript-000000?logo=next.js)]()
-[![Database](https://img.shields.io/badge/Database-PostgreSQL_%2B_pgvector-4169E1?logo=postgresql)]()
+[![Backend](https://img.shields.io/badge/Backend-Django%20%26%20DRF-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![AI Framework](https://img.shields.io/badge/AI-LangChain%20%26%20LangGraph-1C3C3C?logo=langchain&logoColor=white)](https://docs.langchain.com/)
+[![LLM](https://img.shields.io/badge/LLM-OpenAI%20GPT--4o-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/)
+[![Frontend](https://img.shields.io/badge/Frontend-Next.js%20%2B%20TypeScript-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/docs)
+[![Database](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20pgvector-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
+
 
 ## **AI Career Coach** là hệ thống ứng dụng **Trí tuệ nhân tạo (AI)** giúp phân tích khoảng cách năng lực của sinh viên, đề xuất lộ trình học tập cá nhân hóa và cung cấp môi trường luyện phỏng vấn ảo sát với thực tế tuyển dụng.
 
@@ -49,3 +51,48 @@
 <div align="center">
   <img src="./assets/architecture_diagram.png" alt="Architecture" width="800">
 </div>
+
+---
+
+## 🧩 Yêu cầu hệ thống (Prerequisites)
+
+- 🧰 **Git** – Quản lý mã nguồn.
+- 📦 **Node.js (≥ 24)** & **npm (≥ 11)** – Chạy ứng dụng Next.js.
+- 🐍 **Python (≥ 3.13)** & **pip** – Chạy backend Django và hệ sinh thái LangChain.
+- 🔑 **OpenAI API Key** – Dùng cho mô hình GPT và Embeddings.
+
+---
+
+## 🚀 Hướng dẫn cài đặt & chạy nhanh
+
+1. Clone repository
+
+```bash
+git clone https://github.com/leducmanh0838/ai-career-coach.git
+cd ai-career-coach
+```
+
+2. Chạy toàn bộ bằng Docker
+
+```bash
+docker-compose up --build
+```
+
+## 📚 Tài liệu tham khảo (References & Documentation)
+
+Quá trình phát triển dự án dựa trên tài liệu chính thức từ các công nghệ sau:
+
+* 🐍 **Django:** [Django Documentation](https://docs.djangoproject.com/)
+* 🚀 **Django REST Framework:** [DRF Guide](https://www.django-rest-framework.org/)
+* ⚛️ **Next.js:** [Next.js Docs](https://nextjs.org/docs)
+* 🧠 **LangChain:** [LangChain Python Documentation](https://python.langchain.com/)
+* 🐘 **PostgreSQL & pgvector:** [PostgreSQL Docs](https://www.postgresql.org/docs/) & [pgvector GitHub](https://github.com/pgvector/pgvector)
+* 🤖 **OpenAI API:** [OpenAI Platform Documentation](https://platform.openai.com/docs/)
+
+---
+
+## 👥 Tác giả (Authors)
+Lê Đức Mạnh — Team Leader & Developer — manhz.dev
+
+## 🧾 Giấy phép
+Dự án này được phân phối theo Giấy phép MIT License.
