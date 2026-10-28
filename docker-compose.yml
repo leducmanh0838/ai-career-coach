@@ -87,9 +87,7 @@ services:
     profiles:
       - production
     restart: always
-    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run --token ${TUNNEL_TOKEN:?Vui lòng khai báo TUNNEL_TOKEN trong file .env}
-    volumes:
-      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     depends_on:
       - frontend
       - backend
