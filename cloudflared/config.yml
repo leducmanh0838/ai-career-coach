@@ -1,0 +1,28 @@
+
+ingress:
+  # Django REST API
+  - hostname: career.manhz.dev
+    path: ^/api(/.*)?$
+    service: http://backend:8001
+
+  # Django Admin và Jazzmin
+  - hostname: career.manhz.dev
+    path: ^/admin(/.*)?$
+    service: http://backend:8001
+
+  # Django static files: CSS, JavaScript, fonts, admin assets...
+  - hostname: career.manhz.dev
+    path: ^/static(/.*)?$
+    service: http://backend:8001
+
+  # Django media files: ảnh upload, tài liệu...
+  - hostname: career.manhz.dev
+    path: ^/media(/.*)?$
+    service: http://backend:8001
+
+  # Frontend: mọi đường dẫn còn lại
+  - hostname: career.manhz.dev
+    service: http://frontend:5174
+
+  # Các request không khớp
+  - service: http_status:404
